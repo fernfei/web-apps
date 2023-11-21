@@ -142,13 +142,42 @@ if (window.Common === undefined) {
             'setReferenceData': function(data) {
                 $me.trigger('setreferencedata', data);
             },
-
-            'setRequestedDocument': function(data) {
-                $me.trigger('setrequesteddocument', data);
+            'goToBookmark': function (data) {
+                $me.trigger('gotobookmark', data);
             },
-
-            'setRequestedSpreadsheet': function(data) {
-                $me.trigger('setrequestedspreadsheet', data);
+            'bindListenerCursorEvent': function () {
+                $me.trigger('bindListenerCursorEvent');
+            },
+            'unbindListenerCursorEvent': function () {
+                $me.trigger('unbindListenerCursorEvent');
+            },
+            'getBookmarkPosition': function (data) {
+                data = JSON.stringify(data);
+                $me.trigger('getBookmarkPosition',data);
+            },
+            'getCatalogList': function (data) {
+                $me.trigger('getCatalogList',data);
+            },
+            'switchDisableEditor': function (data) {
+                $me.trigger('switchDisableEditor',  data);
+            },
+            'addBookMark': function (data) {
+                $me.trigger('addBookMark',data);
+            },
+            'removeBookmark': function (data) {
+                $me.trigger('removeBookmark',data);
+            },
+            'switchCursor': function (data) {
+                $me.trigger('switchCursor',data);
+            },
+            'setWatermark': function (data) {
+                $me.trigger('setWatermark',data);
+            },
+            'removeWatermark': function (data) {
+                $me.trigger('removeWatermark',data);
+            },
+            'signature': function (data) {
+                $me.trigger('signature', data);
             },
 
             'setReferenceSource': function(data) {
@@ -203,6 +232,35 @@ if (window.Common === undefined) {
                 _postMessage({ event: 'onAppReady' });
             },
 
+            getCatalogList: function (data) {
+                _postMessage({
+                    event: 'onLoadedCatalog',
+                    data: data
+                });
+            },
+            onCursorChange: function (data) {
+                _postMessage({
+                    event: 'onCursorChange',
+                    data: data
+                });
+
+            },
+            getBookmarkPositionFunResult: function (data) {
+                _postMessage({
+                    event: 'getBookmarkPositionFunResult',
+                    data: data
+                });
+            },
+            /**
+             * {@link DE.Controllers.Banshion#getCatalogList getCatalogList}的返回值回调
+             * @param data
+             */
+            getCatalogListFunResult: function (data) {
+                _postMessage({
+                    event: 'getCatalogListFunResult',
+                    data: data
+                });
+            },
             requestEditRights: function() {
                 _postMessage({ event: 'onRequestEditRights' });
             },

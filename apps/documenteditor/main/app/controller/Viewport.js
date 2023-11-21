@@ -209,6 +209,11 @@ define([
         },
 
         onAppReady: function (config) {
+            try {
+                Common.Gateway.getCatalogList(this.getApplication().getController('Banshion').getCatalogList());
+            } catch (e) {
+                console.error(e)
+            }
         },
 
         onLayoutChanged: function(area) {

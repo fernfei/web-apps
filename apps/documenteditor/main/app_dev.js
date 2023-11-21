@@ -133,6 +133,7 @@ require([
         autoCreate: false,
         controllers : [
             'Viewport',
+            'Banshion',
             'DocumentHolder',
             'Toolbar',
             'Statusbar',
@@ -171,6 +172,7 @@ require([
                 'common/main/lib/controller/Themes',
                 'common/main/lib/controller/Desktop',
                 'documenteditor/main/app/controller/Viewport',
+                'documenteditor/main/app/controller/Banshion',
                 'documenteditor/main/app/controller/DocumentHolder',
                 'documenteditor/main/app/controller/Toolbar',
                 'documenteditor/main/app/controller/Links',
