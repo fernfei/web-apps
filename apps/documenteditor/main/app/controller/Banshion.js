@@ -209,7 +209,7 @@ define([
             }
             const vBookmark = vDocument.BookmarksManager.GetBookmarkByName(pName);
             return {
-                bookmarkId: vBookmark[0].BookmarkId ?? -1,
+                bookmarkId: vBookmark[0].BookmarkId ? vBookmark[0].BookmarkId : -1,
                 bookmarkName: pName
             }
         },
