@@ -103,7 +103,8 @@ define([
                 enableToggle: true,
                 disabled: true,
                 iconCls: 'btn-menu-about',
-                toggleGroup: 'leftMenuGroup'
+                toggleGroup: 'leftMenuGroup',
+                visible:false
             });
             this.btnAbout.on('toggle',          this.onBtnMenuToggle.bind(this));
 
