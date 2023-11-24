@@ -333,6 +333,7 @@ module.exports = function(grunt) {
         return {
             terser: {
                 options: {
+                    mangle: false, // 设置为 false 来关闭变量名和函数名的混淆
                     compress: false, // 设置为 false 来关闭代码压缩
                     format: {
                         preamble: '/** vim: et:ts=4:sw=4:sts=4\n' +
@@ -482,6 +483,7 @@ module.exports = function(grunt) {
 
             terser: {
                 options: {
+                    mangle: false, // 设置为 false 来关闭变量名和函数名的混淆
                     compress: false, // 设置为 false 来关闭代码压缩
                     format: {
                         comments: false,
@@ -506,6 +508,7 @@ module.exports = function(grunt) {
             pkg: packageFile,
             terser: {
                 options: {
+                    mangle: false, // 设置为 false 来关闭变量名和函数名的混淆
                     compress: false, // 设置为 false 来关闭代码压缩
                     format: {
                         comments: false,
@@ -665,6 +668,7 @@ module.exports = function(grunt) {
 
             terser: {
                 options: {
+                    mangle: false, // 设置为 false 来关闭变量名和函数名的混淆
                     compress: false, // 设置为 false 来关闭代码压缩
                     format: {
                         comments: false,
@@ -716,6 +720,7 @@ module.exports = function(grunt) {
 
             terser: {
                 options: {
+                    mangle: false, // 设置为 false 来关闭变量名和函数名的混淆
                     compress: false, // 设置为 false 来关闭代码压缩
                     format: {
                         comments: false,
