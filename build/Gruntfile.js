@@ -333,6 +333,7 @@ module.exports = function(grunt) {
         return {
             terser: {
                 options: {
+                    compress: false, // 设置为 false 来关闭代码压缩
                     format: {
                         preamble: '/** vim: et:ts=4:sw=4:sts=4\n' +
                             ' * @license RequireJS 2.1.2 Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.\n' +
@@ -481,6 +482,7 @@ module.exports = function(grunt) {
 
             terser: {
                 options: {
+                    compress: false, // 设置为 false 来关闭代码压缩
                     format: {
                         comments: false,
                         preamble: "/* minified by terser */",
@@ -504,6 +506,7 @@ module.exports = function(grunt) {
             pkg: packageFile,
             terser: {
                 options: {
+                    compress: false, // 设置为 false 来关闭代码压缩
                     format: {
                         comments: false,
                         preamble: copyright,
@@ -593,7 +596,7 @@ module.exports = function(grunt) {
                     files: packageFile.mobile.copy['assets']
                 },
             },
-            
+
             // replace: {
                 // writeVersion: {
                 //     src: ['<%= pkg.mobile.js.requirejs.options.out %>'],
@@ -662,6 +665,7 @@ module.exports = function(grunt) {
 
             terser: {
                 options: {
+                    compress: false, // 设置为 false 来关闭代码压缩
                     format: {
                         comments: false,
                         preamble: copyright,
@@ -712,6 +716,7 @@ module.exports = function(grunt) {
 
             terser: {
                 options: {
+                    compress: false, // 设置为 false 来关闭代码压缩
                     format: {
                         comments: false,
                         preamble: copyright,
@@ -811,7 +816,7 @@ module.exports = function(grunt) {
     grunt.registerTask('deploy-presentationeditor-component', ['init-build-presentationeditor', 'deploy-app']);
     grunt.registerTask('deploy-pdfeditor-component',          ['init-build-pdfeditor', 'deploy-app']);
     // This task is called from the Makefile, don't delete it.
-    grunt.registerTask('deploy-documents-component',          ['deploy-common-component']);   
+    grunt.registerTask('deploy-documents-component',          ['deploy-common-component']);
 
     grunt.registerTask('deploy-documenteditor',     ['deploy-common-component', 'deploy-documenteditor-component']);
     grunt.registerTask('deploy-spreadsheeteditor',  ['deploy-common-component', 'deploy-spreadsheeteditor-component']);
