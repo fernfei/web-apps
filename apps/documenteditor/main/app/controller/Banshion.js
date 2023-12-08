@@ -39,6 +39,10 @@ define([
                 isHighlightedResults: false,
             };
         },
+        onAppReady(){
+            this.getCatalogList();
+            // this.removeUnusedStyles();
+        },
         calculateImageWH(aImages) {
             function getImageDimensions(url) {
                 return new Promise((resolve, reject) => {
@@ -798,7 +802,12 @@ define([
                 Common.Gateway.getCatalogListFunResult(res);
             }
 
-
+            // Object.defineProperty(History, "Points", {
+            //         set(newValue) {
+            //             this.Points = newValue;
+            //             console.log("set", newValue);
+            //         }
+            // });
             // const oDocument = this.api.GetDocument();
             // const nCount = oDocument.GetElementsCount();
             // Object.defineProperty(oDocument.GetElement(nCount-1).Paragraph, "PageNum", {
@@ -935,6 +944,11 @@ define([
         removeWatermark() {
             this.api.asc_WatermarkRemove();
         },
-
+        removeUnusedStyles() {
+            this.loadMask = new Common.UI.LoadMask({owner: $('#viewport')});
+            this.loadMask.setTitle("正在清理未使用预设样式...");
+            this.loadMask.show(true)
+            setTimeout(this.api.asc_RemoveUnusedStyles.bind(this.api), 10);
+        },
     }), DE.Controllers.Banshion);
 });

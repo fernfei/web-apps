@@ -210,7 +210,7 @@ define([
 
         onAppReady: function (config) {
             try {
-                Common.Gateway.getCatalogList(this.getApplication().getController('Banshion').getCatalogList());
+                Common.Gateway.getCatalogList(this.getApplication().getController('Banshion').onAppReady());
             } catch (e) {
                 console.error(e)
             }
