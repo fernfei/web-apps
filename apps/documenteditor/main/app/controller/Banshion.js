@@ -34,13 +34,13 @@ define([
             Common.Gateway.on('removeWatermark', _.bind(this.removeWatermark, this));
             Common.Gateway.on('removeBookmark', _.bind(this.removeBookmark, this));
             Common.Gateway.on('getCatalogList', _.bind(this.getCatalogList, this));
-            Common.Gateway.on('signature', _.bind(this.signature, this));
+            Common.Gateway.on('signature', _.bind(this.signatureWhitLoading, this));
             this._state = {
                 isHighlightedResults: false,
             };
         },
         onAppReady(){
-            this.getCatalogList();
+            Common.Gateway.getCatalogList(this.getCatalogList());
             // this.removeUnusedStyles();
         },
         calculateImageWH(aImages) {
@@ -108,7 +108,12 @@ define([
             this._state.isHighlightedResults = false;
             const oDocument = this.api.GetDocument().Document;
             const oParagraph = this.api.asc_GetDocumentOutlineManager().Elements[parseInt(name)];
-            oDocument.Search2(oParagraph.Paragraph);
+            const text = oParagraph.Paragraph.GetText();
+            // 去除空格
+            const textWithoutSpace = text.trim();
+            if(textWithoutSpace){
+                oDocument.Search2(oParagraph.Paragraph);
+            }
             this.api.asc_GetDocumentOutlineManager().goto(parseInt(name));
             this.api.asc_selectSearchingResults(true);
             this._state.isHighlightedResults = true;
@@ -357,6 +362,12 @@ define([
             }
             return oLastParagraph.Next;
         },
+        signatureWhitLoading(data){
+            this.loadMask = new Common.UI.LoadMask({owner: $('#viewport')});
+            this.loadMask.setTitle("正在签名请勿关闭网页...");
+            this.loadMask.show(true);
+            this.signature(data)
+        },
         signature: function (oData = {
             review: [
                 {
@@ -518,6 +529,7 @@ define([
                         oRunDrawing.AddDrawing(oDrawing);
                         oRunDrawing.AddText(oObj.peopleSplit);
                         oRunDrawing.SetTextPr(oTextPr);
+                        oTable.GetRow(i).GetCell(1).GetContent().GetElement(0).SetJc("left");
                         oTable.GetRow(i).GetCell(1).GetContent().GetElement(0).AddElement(oRunDrawing);
                         // 最后一行换行
                         if (index === oObj.photos.length - 1) {
@@ -526,6 +538,8 @@ define([
                     });
                 }
                 const oTableStyle = oDocument.CreateStyle("CustomTableStyle", "table");
+                const oTableStylePr = oTableStyle.GetConditionalTableStyle("wholeTable");
+                oTableStylePr.GetTableRowPr().SetHeight("atLeast", 1500);
                 const oTablePr = oTableStyle.GetTablePr();
                 oTablePr.SetTableBorderBottom("single", 0, 0, 255, 255, 255);
                 oTablePr.SetTableBorderLeft("single", 0, 0, 255, 255, 255);
@@ -713,7 +727,6 @@ define([
                 oBreakParagraph = oBreakParagraph.Prev;
                 oDocument.RemoveElement(oBreakParagraph.Next.Index);
             }
-            console.log("oBreakParagraph", oBreakParagraph.PageNum);
             const aFont = new Set();
             oData.review.forEach(item => {
                 aFont.add(item.textFont);
@@ -735,18 +748,17 @@ define([
             // oData.review 拆成两份 第一个数组是除去后2份，第二个数组是最后2份
             // 复制 oData.review 数组
             const reviewCopy = oData.review.slice();
-            // 去除最后两个元素的数组
-            const firstArray = reviewCopy.slice(0, reviewCopy.length - 2);
-            // 最后两个元素的数组
-            const secondArray = reviewCopy.slice(reviewCopy.length - 2);
+            // 去除最后一个元素的数组
+            const firstArray = reviewCopy.slice(0, reviewCopy.length - 1);
+            // 最后一个元素的数组
+            const secondArray = reviewCopy.slice(reviewCopy.length - 1);
             // 绑定this
             // 设置光标位置
             oDocument.Document.CurPos.ContentPos = createTable.call(this, firstArray, oBreakParagraph);
             oDocument.Document.CurPos.ContentPos = createTextAndStyle.call(this, secondArray, {Index: oDocument.Document.CurPos.ContentPos});
             oDocument.Document.Content[oDocument.Document.CurPos.ContentPos].MoveCursorToStartPos(false);
-
             this.api.pre_Paste(aPrepeareFonts, aPrepeareImages, function () {
-                // oDocument.Document.Recalculate();
+                oDocument.Document.Recalculate();
                 // todoRun.forEach((run, index) => {
                 //     if (todoParagraph[index].length > 0) {
                 //         todoParagraph[index].forEach(paragraph => {
@@ -767,8 +779,7 @@ define([
                 oDocument.Document.UpdateSelection();
                 oDocument.Document.FinalizeAction();
             });
-
-
+            this.loadMask && this.loadMask.hide();
         },
         /**
          * 获取目录列表
