@@ -964,10 +964,62 @@
             });
         }
         var _signature= function (data) {
-            _sendCommand({
-                command: 'signature',
-                data: data
-            });
+            var MessageDispatcher = function (fn, scope) {
+                var _fn = fn,
+                    _scope = scope || window,
+                    _eventFn = function (msg) {
+                        _onMessage(msg);
+                    };
+
+                var _bindEvents = function () {
+                    if (window.addEventListener) {
+                        window.addEventListener("message", _eventFn, false)
+                    } else if (window.attachEvent) {
+                        window.attachEvent("onmessage", _eventFn);
+                    }
+                };
+
+                var _unbindEvents = function () {
+                    if (window.removeEventListener) {
+                        window.removeEventListener("message", _eventFn, false)
+                    } else if (window.detachEvent) {
+                        window.detachEvent("onmessage", _eventFn);
+                    }
+                };
+
+                var _onMessage = function (msg) {
+                    // TODO: check message origin
+                    if (msg && window.JSON) {
+
+                        try {
+                            var msg = window.JSON.parse(msg.data);
+                            if (_fn) {
+                                _fn.call(_scope, msg);
+                            }
+                        } catch (e) {
+                        }
+                    }
+                };
+
+                _bindEvents.call(this);
+
+                return {
+                    unbindEvents: _unbindEvents
+                }
+            };
+            var promiseExecutor = function (resolve, reject) {
+                _sendCommand({
+                    command: 'signature',
+                    data: data
+                });
+                var _msgDispatcher = new MessageDispatcher(function (data) {
+                    if (data.event === 'signatureFunResult') {
+                        resolve(data.data);
+                        _msgDispatcher.unbindEvents();
+                    }
+                }, this);
+            };
+            return new Promise(promiseExecutor.bind(this));
         }
         return {
             showMessage         : _showMessage,

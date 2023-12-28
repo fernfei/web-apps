@@ -362,11 +362,21 @@ define([
             }
             return oLastParagraph.Next;
         },
-        signatureWhitLoading(data){
+        signatureWhitLoading(data,isExternal = true){
+            if (this.loadMask) {
+                this.loadMask.hide();
+            }
             this.loadMask = new Common.UI.LoadMask({owner: $('#viewport')});
             this.loadMask.setTitle("正在签名请勿关闭网页...");
             this.loadMask.show(true);
-            this.signature(data)
+            let _this = this;
+            this.signature(data,()=>{
+                _this.loadMask && _this.loadMask.hide();
+                if (isExternal) {
+                    // 主动发起请求 返回结果
+                    Common.Gateway.signatureFunResult(true);
+                }
+            })
         },
         signature: function (oData = {
             review: [
@@ -464,7 +474,7 @@ define([
                 },
             ]
 
-        }) {
+        },success) {
             /**
              * 计算twip
              * @param oRun 文本对象
@@ -716,9 +726,11 @@ define([
             const oDocument = this.api.GetDocument();
             // 如果文档没有计算完成，等待10毫秒后再次执行
             if (!oDocument.Document._Calculated) {
-                setTimeout(this.signature.bind(this, oData), 10);
+                this.timerId = setTimeout(this.signature.bind(this, oData,success), 10);
                 return;
             }
+            clearTimeout(this.timerId);
+            this.timerId = null;
             oDocument.Document.StartAction(AscDFH.historydescription_Document_AddCaption);
             let oBreakParagraph = this.addBlankPage(0);
             // 第一页内容是否填满
@@ -759,14 +771,6 @@ define([
             oDocument.Document.Content[oDocument.Document.CurPos.ContentPos].MoveCursorToStartPos(false);
             this.api.pre_Paste(aPrepeareFonts, aPrepeareImages, function () {
                 oDocument.Document.Recalculate();
-                // todoRun.forEach((run, index) => {
-                //     if (todoParagraph[index].length > 0) {
-                //         todoParagraph[index].forEach(paragraph => {
-                //             console.log("SetIndFirstLine", calculateIndent(run))
-                //             paragraph.SetIndFirstLine(calculateIndent(run));
-                //         });
-                //     }
-                // });
                 const oTable = todoTableRun[-1];
                 delete todoTableRun[-1];
                 Object.keys(todoTableRun).forEach(function (key) {
@@ -778,8 +782,8 @@ define([
                 oDocument.Document.UpdateInterface();
                 oDocument.Document.UpdateSelection();
                 oDocument.Document.FinalizeAction();
+                success();
             });
-            this.loadMask && this.loadMask.hide();
         },
         /**
          * 获取目录列表

@@ -252,12 +252,22 @@ if (window.Common === undefined) {
                 });
             },
             /**
-             * {@link DE.Controllers.Banshion#getCatalogList getCatalogList}的返回值回调
+             * {@link DE.Controllers.Banshion.getCatalogList getCatalogList}的返回值回调
              * @param data
              */
             getCatalogListFunResult: function (data) {
                 _postMessage({
                     event: 'getCatalogListFunResult',
+                    data: data
+                });
+            },
+            /**
+             * {@link DE.Controllers.Banshion.signatureWhitLoading getCatalogList}的返回值回调
+             * @param data
+             */
+            signatureFunResult: function (data) {
+                _postMessage({
+                    event: 'signatureFunResult',
                     data: data
                 });
             },
