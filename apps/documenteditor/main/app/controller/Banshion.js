@@ -959,11 +959,5 @@ define([
         removeWatermark() {
             this.api.asc_WatermarkRemove();
         },
-        removeUnusedStyles() {
-            this.loadMask = new Common.UI.LoadMask({owner: $('#viewport')});
-            this.loadMask.setTitle("正在清理未使用预设样式...");
-            this.loadMask.show(true)
-            setTimeout(this.api.asc_RemoveUnusedStyles.bind(this.api), 10);
-        },
     }), DE.Controllers.Banshion);
 });
