@@ -52,8 +52,8 @@ const config = {
 
   devtool: env === 'production' ? false/*'source-map'*/ : 'source-map', // TODO: turn off debugger source map before release
   optimization: {
-    minimizer: [new TerserPlugin({
-    })],
+    // minimizer: [new TerserPlugin({
+    // })],// 混淆代码
     moduleIds: 'named',
   },
   module: {
