@@ -404,7 +404,7 @@ define([
                     items: [
                         { caption: this.autoFitToWindowText, value: 0 },
                         { caption: this.autoFitToContentText,  value: 1 },
-                        // { caption: this.switchRowColumnText,  value: 2 },
+                        { caption: this.switchRowColumnText,  value: 2 },
                         { caption: this.distributeRowsEvenlyText,  value: 3 },
                         { caption: this.distributeColumnsEvenlyText,  value: 4 },
                     ]
