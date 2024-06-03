@@ -300,68 +300,6 @@ define([
         private_MM2Twips(mm) {
             return mm / (25.4 / 72.0 / 20);
         },
-
-        /**
-         * 添加新空页
-         */
-        addBlankPage(targetPage = 0) {
-            // 找出目标页的最后一个元素
-            const oDocument = this.api.GetDocument();
-            const nCount = oDocument.GetElementsCount();
-            let nLastIndex = 0;
-            for (let i = 0; i < nCount; i++) {
-                const oApiElements = oDocument.GetElement(i);
-                if (oApiElements.GetClassType() === 'paragraph' && oApiElements.Paragraph.PageNum === targetPage) {
-                    nLastIndex = i;
-                }
-                if (oApiElements.GetClassType() === 'table' && oApiElements.Table.PageNum === targetPage) {
-                    nLastIndex = i;
-                }
-            }
-            // 是否是有多个页面
-            const bMultiPage = this.api.GetDocument().Document.FullRecalc.PageIndex;
-            // TODO nLastIndex原本应该是第一页的最后一个元素，未知原因导致nLastIndex不是第一页的最后一个元素
-            let oLastParagraph = bMultiPage ? oDocument.GetElement(nLastIndex - 1 < 0 ? 0 : nLastIndex - 1) : oDocument.GetElement(nLastIndex);
-            oLastParagraph = oLastParagraph.Paragraph;
-
-            // 开始活动，通知文档开始修改
-            // oDocument.Document.StartAction(AscDFH.historydescription_Document_AddBlankPage);
-
-            let nContentPos = oLastParagraph.Index
-
-
-            oLastParagraph.Content[oLastParagraph.CurPos.ContentPos].State.ContentPos = oLastParagraph.GetText().length;
-
-            if (oLastParagraph.Next) {
-                oDocument.Document.CurPos.ContentPos = nContentPos + 1;
-                oDocument.Document.Content[nContentPos + 1].MoveCursorToStartPos();
-            }
-            oDocument.Document.AddNewParagraph(undefined, true);
-            oDocument.Document.CurPos.ContentPos = nContentPos + 1;
-            oDocument.Document.Content[nContentPos + 1].MoveCursorToStartPos();
-            oDocument.Document.AddNewParagraph(undefined, true);
-
-            if (oLastParagraph.Next && oLastParagraph.Next.IsParagraph()) {
-                oLastParagraph.Next.AddToParagraph(new AscWord.CRunBreak(AscWord.break_Page));
-                // 清空样式
-                oLastParagraph.Next.Clear_Formatting();
-                oDocument.Document.CurPos.ContentPos = nContentPos + 1;
-                oDocument.Document.Content[nContentPos + 1].MoveCursorToStartPos();
-                // oDocument.Document.Content[oDocument.Document.CurPos.ContentPos].Clear_Formatting();
-            }
-
-            // oDocument.Document.Content[oDocument.Document.CurPos.ContentPos].Content[oLastParagraph.CurPos.ContentPos].State.ContentPos = oLastParagraph.GetText().length;
-            // 结束活动，通知文档修改结束
-            oDocument.Document.Recalculate();
-            oDocument.Document.UpdateInterface();
-            oDocument.Document.UpdateSelection();
-            oDocument.Document.FinalizeAction();
-            // 多页面返回被添加break_Page的段落，单页面返回被添加break_Page的段落的下一个段落，目的就是始终返回的是空白页的第一个段落
-            if (!bMultiPage) {
-                return oLastParagraph.Next ? oLastParagraph.Next.Next : oLastParagraph;
-            }
-            return oLastParagraph.Next;
-        },
         signatureWhitLoading(data,isExternal = true){
             if (this.loadMask) {
                 this.loadMask.hide();
@@ -731,14 +669,9 @@ define([
             }
             clearTimeout(this.timerId);
             this.timerId = null;
+            this.api.addBlankPage(0);
             oDocument.Document.StartAction(AscDFH.historydescription_Document_AddCaption);
-            let oBreakParagraph = this.addBlankPage(0);
-            // 第一页内容是否填满
-            const bFirstFull = oBreakParagraph.PageNum !== oBreakParagraph.Next.PageNum;
-            if (bFirstFull) {
-                oBreakParagraph = oBreakParagraph.Prev;
-                oDocument.RemoveElement(oBreakParagraph.Next.Index);
-            }
+            let oBreakParagraph = oDocument.Document.Content[oDocument.Document.Pages[1].Pos];
             const aFont = new Set();
             oData.review.forEach(item => {
                 aFont.add(item.textFont);
@@ -771,6 +704,7 @@ define([
             oDocument.Document.Content[oDocument.Document.CurPos.ContentPos].MoveCursorToStartPos(false);
             this.api.pre_Paste(aPrepeareFonts, aPrepeareImages, function () {
                 oDocument.Document.Recalculate();
+                oDocument.Document.FinalizeAction();
                 const oTable = todoTableRun[-1];
                 delete todoTableRun[-1];
                 Object.keys(todoTableRun).forEach(function (key) {
@@ -782,7 +716,7 @@ define([
                 oDocument.Document.UpdateInterface();
                 oDocument.Document.UpdateSelection();
                 oDocument.Document.FinalizeAction();
-                success();
+                success && success();
             });
         },
         /**
