@@ -840,6 +840,234 @@
             });
         };
 
+        var _goToBookMark = function (data) {
+            _sendCommand({
+                command: 'goToBookmark',
+                data: data
+            });
+        };
+        var _bindListenerCursorEvent = function () {
+            _sendCommand({
+                command: 'bindListenerCursorEvent',
+            });
+        };
+        var _unbindListenerCursorEvent = function () {
+            _sendCommand({
+                command: 'unbindListenerCursorEvent',
+            });
+        };
+        var _addBookMark = function (data) {
+            _sendCommand({
+                command: 'addBookMark',
+                data:data
+            });
+        };
+        var _removeBookmark = function (data) {
+            _sendCommand({
+                command: 'removeBookmark',
+                data:data
+            });
+        };
+        var _switchCursor = function (data) {
+            _sendCommand({
+                command: 'switchCursor',
+                data:data
+            });
+        };
+        var _setWatermark = function (data) {
+            _sendCommand({
+                command: 'setWatermark',
+                data:data
+            });
+        };
+        var _removeWatermark = function (data) {
+            _sendCommand({
+                command: 'removeWatermark',
+                data:data
+            });
+        };
+
+
+        var _getBookmarkPosition = function (data) {
+            var MessageDispatcher = function (fn, scope) {
+                var _fn = fn,
+                    _scope = scope || window,
+                    _eventFn = function (msg) {
+                        _onMessage(msg);
+                    };
+
+                var _bindEvents = function () {
+                    if (window.addEventListener) {
+                        window.addEventListener("message", _eventFn, false)
+                    } else if (window.attachEvent) {
+                        window.attachEvent("onmessage", _eventFn);
+                    }
+                };
+
+                var _unbindEvents = function () {
+                    if (window.removeEventListener) {
+                        window.removeEventListener("message", _eventFn, false)
+                    } else if (window.detachEvent) {
+                        window.detachEvent("onmessage", _eventFn);
+                    }
+                };
+
+                var _onMessage = function (msg) {
+                    // TODO: check message origin
+                    if (msg && window.JSON) {
+
+                        try {
+                            var msg = window.JSON.parse(msg.data);
+                            if (_fn) {
+                                _fn.call(_scope, msg);
+                            }
+                        } catch (e) {
+                        }
+                    }
+                };
+
+                _bindEvents.call(this);
+
+                return {
+                    unbindEvents: _unbindEvents
+                }
+            };
+            var promiseExecutor = function (resolve, reject) {
+                _sendCommand({
+                    command: 'getBookmarkPosition',
+                    data: data
+                });
+                var _msgDispatcher = new MessageDispatcher(function (data) {
+                    if (data.event === 'getBookmarkPositionFunResult') {
+                        resolve(data.data);
+                        _msgDispatcher.unbindEvents();
+                    }
+                }, this);
+            };
+            return new Promise(promiseExecutor.bind(this));
+        };
+        var _getCatalogList = function (data) {
+            var MessageDispatcher = function (fn, scope) {
+                var _fn = fn,
+                    _scope = scope || window,
+                    _eventFn = function (msg) {
+                        _onMessage(msg);
+                    };
+
+                var _bindEvents = function () {
+                    if (window.addEventListener) {
+                        window.addEventListener("message", _eventFn, false)
+                    } else if (window.attachEvent) {
+                        window.attachEvent("onmessage", _eventFn);
+                    }
+                };
+
+                var _unbindEvents = function () {
+                    if (window.removeEventListener) {
+                        window.removeEventListener("message", _eventFn, false)
+                    } else if (window.detachEvent) {
+                        window.detachEvent("onmessage", _eventFn);
+                    }
+                };
+
+                var _onMessage = function (msg) {
+                    // TODO: check message origin
+                    if (msg && window.JSON) {
+
+                        try {
+                            var msg = window.JSON.parse(msg.data);
+                            if (_fn) {
+                                _fn.call(_scope, msg);
+                            }
+                        } catch (e) {
+                        }
+                    }
+                };
+
+                _bindEvents.call(this);
+
+                return {
+                    unbindEvents: _unbindEvents
+                }
+            };
+            var promiseExecutor = function (resolve, reject) {
+                _sendCommand({
+                    command: 'getCatalogList',
+                    data: data
+                });
+                var _msgDispatcher = new MessageDispatcher(function (data) {
+                    if (data.event === 'getCatalogListFunResult') {
+                        resolve(data.data);
+                        _msgDispatcher.unbindEvents();
+                    }
+                }, this);
+            };
+            return new Promise(promiseExecutor.bind(this));
+        };
+        var _switchDisableEditor= function (data) {
+            _sendCommand({
+                command: 'switchDisableEditor',
+                data: data
+            });
+        }
+        var _signature= function (data) {
+            var MessageDispatcher = function (fn, scope) {
+                var _fn = fn,
+                    _scope = scope || window,
+                    _eventFn = function (msg) {
+                        _onMessage(msg);
+                    };
+
+                var _bindEvents = function () {
+                    if (window.addEventListener) {
+                        window.addEventListener("message", _eventFn, false)
+                    } else if (window.attachEvent) {
+                        window.attachEvent("onmessage", _eventFn);
+                    }
+                };
+
+                var _unbindEvents = function () {
+                    if (window.removeEventListener) {
+                        window.removeEventListener("message", _eventFn, false)
+                    } else if (window.detachEvent) {
+                        window.detachEvent("onmessage", _eventFn);
+                    }
+                };
+
+                var _onMessage = function (msg) {
+                    // TODO: check message origin
+                    if (msg && window.JSON) {
+
+                        try {
+                            var msg = window.JSON.parse(msg.data);
+                            if (_fn) {
+                                _fn.call(_scope, msg);
+                            }
+                        } catch (e) {
+                        }
+                    }
+                };
+
+                _bindEvents.call(this);
+
+                return {
+                    unbindEvents: _unbindEvents
+                }
+            };
+            var promiseExecutor = function (resolve, reject) {
+                _sendCommand({
+                    command: 'signature',
+                    data: data
+                });
+                var _msgDispatcher = new MessageDispatcher(function (data) {
+                    if (data.event === 'signatureFunResult') {
+                        resolve(data.data);
+                        _msgDispatcher.unbindEvents();
+                    }
+                }, this);
+            };
+            return new Promise(promiseExecutor.bind(this));
+        }
         return {
             showMessage         : _showMessage,
             processSaveResult   : _processSaveResult,
@@ -869,6 +1097,19 @@
             setRequestedDocument: _setRequestedDocument,
             setRequestedSpreadsheet: _setRequestedSpreadsheet,
             setReferenceSource: _setReferenceSource,
+            setReferenceSource: _setReferenceSource,
+            goToBookmark: _goToBookMark,
+            bindListenerCursorEvent: _bindListenerCursorEvent,
+            unbindListenerCursorEvent: _unbindListenerCursorEvent,
+            getBookmarkPosition: _getBookmarkPosition,
+            switchDisableEditor: _switchDisableEditor,
+            addBookMark: _addBookMark,
+            removeBookmark: _removeBookmark,
+            switchCursor: _switchCursor,
+            setWatermark: _setWatermark,
+            removeWatermark: _removeWatermark,
+            getCatalogList: _getCatalogList,
+            signature: _signature,
             openDocument: _openDocumentFromBinary,
             startFilling: _startFilling
         }

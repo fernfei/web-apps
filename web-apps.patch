@@ -1,0 +1,360 @@
+diff --git a/apps/api/documents/api.js b/apps/api/documents/api.js
+index 30ea658cd3..3fa7485d2d 100644
+--- a/apps/api/documents/api.js
++++ b/apps/api/documents/api.js
+@@ -73,7 +73,7 @@
+                 location: <location>,
+                 canCoAuthoring: <can coauthoring documents>,
+                 canBackToFolder: <can return to folder> - deprecated. use "customization.goback" parameter,
+-                createUrl: 'create document url', 
++                createUrl: 'create document url',
+                 sharingSettingsUrl: 'document sharing settings url',
+                 fileChoiceUrl: 'source url', // for mail merge or image from storage
+                 callbackUrl: <url for connection between sdk and portal>,
+@@ -168,7 +168,7 @@
+                             view: {
+                                 navigation: false/true // navigation button in de
+                             } / false / true, // view tab
+-                            save: false/true // save button on toolbar in 
++                            save: false/true // save button on toolbar in
+                         } / false / true, // use instead of customization.toolbar,
+                         header: {
+                             users: false/true // users list button
+@@ -488,7 +488,7 @@
+ 
+                 _config.document.token = _config.token;
+             }
+-            
++
+             return true;
+         };
+ 
+@@ -793,6 +793,182 @@
+             });
+         };
+ 
++        var _goToBookMark = function (data) {
++            _sendCommand({
++                command: 'goToBookmark',
++                data: data
++            });
++        };
++        var _bindListenerCursorEvent = function () {
++            _sendCommand({
++                command: 'bindListenerCursorEvent',
++            });
++        };
++        var _unbindListenerCursorEvent = function () {
++            _sendCommand({
++                command: 'unbindListenerCursorEvent',
++            });
++        };
++        var _addBookMark = function (data) {
++            _sendCommand({
++                command: 'addBookMark',
++                data:data
++            });
++        };
++        var _removeBookmark = function (data) {
++            _sendCommand({
++                command: 'removeBookmark',
++                data:data
++            });
++        };
++        var _switchCursor = function (data) {
++            _sendCommand({
++                command: 'switchCursor',
++                data:data
++            });
++        };
++        var _setWatermark = function (data) {
++            _sendCommand({
++                command: 'setWatermark',
++                data:data
++            });
++        };
++        var _removeWatermark = function (data) {
++            _sendCommand({
++                command: 'removeWatermark',
++                data:data
++            });
++        };
++
++
++        var _getBookmarkPosition = function (data) {
++            var MessageDispatcher = function (fn, scope) {
++                var _fn = fn,
++                    _scope = scope || window,
++                    _eventFn = function (msg) {
++                        _onMessage(msg);
++                    };
++
++                var _bindEvents = function () {
++                    if (window.addEventListener) {
++                        window.addEventListener("message", _eventFn, false)
++                    } else if (window.attachEvent) {
++                        window.attachEvent("onmessage", _eventFn);
++                    }
++                };
++
++                var _unbindEvents = function () {
++                    if (window.removeEventListener) {
++                        window.removeEventListener("message", _eventFn, false)
++                    } else if (window.detachEvent) {
++                        window.detachEvent("onmessage", _eventFn);
++                    }
++                };
++
++                var _onMessage = function (msg) {
++                    // TODO: check message origin
++                    if (msg && window.JSON) {
++
++                        try {
++                            var msg = window.JSON.parse(msg.data);
++                            if (_fn) {
++                                _fn.call(_scope, msg);
++                            }
++                        } catch (e) {
++                        }
++                    }
++                };
++
++                _bindEvents.call(this);
++
++                return {
++                    unbindEvents: _unbindEvents
++                }
++            };
++            var promiseExecutor = function (resolve, reject) {
++                _sendCommand({
++                    command: 'getBookmarkPosition',
++                    data: data
++                });
++                var _msgDispatcher = new MessageDispatcher(function (data) {
++                    if (data.event === 'getBookmarkPositionFunResult') {
++                        resolve(data.data);
++                        _msgDispatcher.unbindEvents();
++                    }
++                }, this);
++            };
++            return new Promise(promiseExecutor.bind(this));
++        };
++        var _getCatalogList = function (data) {
++            var MessageDispatcher = function (fn, scope) {
++                var _fn = fn,
++                    _scope = scope || window,
++                    _eventFn = function (msg) {
++                        _onMessage(msg);
++                    };
++
++                var _bindEvents = function () {
++                    if (window.addEventListener) {
++                        window.addEventListener("message", _eventFn, false)
++                    } else if (window.attachEvent) {
++                        window.attachEvent("onmessage", _eventFn);
++                    }
++                };
++
++                var _unbindEvents = function () {
++                    if (window.removeEventListener) {
++                        window.removeEventListener("message", _eventFn, false)
++                    } else if (window.detachEvent) {
++                        window.detachEvent("onmessage", _eventFn);
++                    }
++                };
++
++                var _onMessage = function (msg) {
++                    // TODO: check message origin
++                    if (msg && window.JSON) {
++
++                        try {
++                            var msg = window.JSON.parse(msg.data);
++                            if (_fn) {
++                                _fn.call(_scope, msg);
++                            }
++                        } catch (e) {
++                        }
++                    }
++                };
++
++                _bindEvents.call(this);
++
++                return {
++                    unbindEvents: _unbindEvents
++                }
++            };
++            var promiseExecutor = function (resolve, reject) {
++                _sendCommand({
++                    command: 'getCatalogList',
++                    data: data
++                });
++                var _msgDispatcher = new MessageDispatcher(function (data) {
++                    if (data.event === 'getCatalogListFunResult') {
++                        resolve(data.data);
++                        _msgDispatcher.unbindEvents();
++                    }
++                }, this);
++            };
++            return new Promise(promiseExecutor.bind(this));
++        };
++        var _switchDisableEditor= function (data) {
++            _sendCommand({
++                command: 'switchDisableEditor',
++                data: data
++            });
++        }
++        var _signature= function (data) {
++            _sendCommand({
++                command: 'signature',
++                data: data
++            });
++        }
+         return {
+             showMessage         : _showMessage,
+             processSaveResult   : _processSaveResult,
+@@ -821,7 +997,19 @@
+             setReferenceData    : _setReferenceData,
+             setRequestedDocument: _setRequestedDocument,
+             setRequestedSpreadsheet: _setRequestedSpreadsheet,
+-            setReferenceSource: _setReferenceSource
++            setReferenceSource: _setReferenceSource,
++            goToBookmark: _goToBookMark,
++            bindListenerCursorEvent: _bindListenerCursorEvent,
++            unbindListenerCursorEvent: _unbindListenerCursorEvent,
++            getBookmarkPosition: _getBookmarkPosition,
++            switchDisableEditor: _switchDisableEditor,
++            addBookMark: _addBookMark,
++            removeBookmark: _removeBookmark,
++            switchCursor: _switchCursor,
++            setWatermark: _setWatermark,
++            removeWatermark: _removeWatermark,
++            getCatalogList: _getCatalogList,
++            signature: _signature,
+         }
+     };
+ 
+diff --git a/apps/common/Gateway.js b/apps/common/Gateway.js
+index 03bae36ebb..1309fa340b 100644
+--- a/apps/common/Gateway.js
++++ b/apps/common/Gateway.js
+@@ -142,13 +142,42 @@ if (window.Common === undefined) {
+             'setReferenceData': function(data) {
+                 $me.trigger('setreferencedata', data);
+             },
+-
+-            'setRequestedDocument': function(data) {
+-                $me.trigger('setrequesteddocument', data);
++            'goToBookmark': function (data) {
++                $me.trigger('gotobookmark', data);
+             },
+-
+-            'setRequestedSpreadsheet': function(data) {
+-                $me.trigger('setrequestedspreadsheet', data);
++            'bindListenerCursorEvent': function () {
++                $me.trigger('bindListenerCursorEvent');
++            },
++            'unbindListenerCursorEvent': function () {
++                $me.trigger('unbindListenerCursorEvent');
++            },
++            'getBookmarkPosition': function (data) {
++                data = JSON.stringify(data);
++                $me.trigger('getBookmarkPosition',data);
++            },
++            'getCatalogList': function (data) {
++                $me.trigger('getCatalogList',data);
++            },
++            'switchDisableEditor': function (data) {
++                $me.trigger('switchDisableEditor',  data);
++            },
++            'addBookMark': function (data) {
++                $me.trigger('addBookMark',data);
++            },
++            'removeBookmark': function (data) {
++                $me.trigger('removeBookmark',data);
++            },
++            'switchCursor': function (data) {
++                $me.trigger('switchCursor',data);
++            },
++            'setWatermark': function (data) {
++                $me.trigger('setWatermark',data);
++            },
++            'removeWatermark': function (data) {
++                $me.trigger('removeWatermark',data);
++            },
++            'signature': function (data) {
++                $me.trigger('signature', data);
+             },
+ 
+             'setReferenceSource': function(data) {
+@@ -203,6 +232,35 @@ if (window.Common === undefined) {
+                 _postMessage({ event: 'onAppReady' });
+             },
+ 
++            getCatalogList: function (data) {
++                _postMessage({
++                    event: 'onLoadedCatalog',
++                    data: data
++                });
++            },
++            onCursorChange: function (data) {
++                _postMessage({
++                    event: 'onCursorChange',
++                    data: data
++                });
++
++            },
++            getBookmarkPositionFunResult: function (data) {
++                _postMessage({
++                    event: 'getBookmarkPositionFunResult',
++                    data: data
++                });
++            },
++            /**
++             * {@link DE.Controllers.Banshion#getCatalogList getCatalogList}的返回值回调
++             * @param data
++             */
++            getCatalogListFunResult: function (data) {
++                _postMessage({
++                    event: 'getCatalogListFunResult',
++                    data: data
++                });
++            },
+             requestEditRights: function() {
+                 _postMessage({ event: 'onRequestEditRights' });
+             },
+diff --git a/apps/documenteditor/main/app/controller/Viewport.js b/apps/documenteditor/main/app/controller/Viewport.js
+index 4dfbaf8765..3709aa7297 100644
+--- a/apps/documenteditor/main/app/controller/Viewport.js
++++ b/apps/documenteditor/main/app/controller/Viewport.js
+@@ -209,6 +209,11 @@ define([
+         },
+ 
+         onAppReady: function (config) {
++            try {
++                Common.Gateway.getCatalogList(this.getApplication().getController('Banshion').getCatalogList());
++            } catch (e) {
++                console.error(e)
++            }
+         },
+ 
+         onLayoutChanged: function(area) {
+diff --git a/apps/documenteditor/main/app_dev.js b/apps/documenteditor/main/app_dev.js
+index 838a5e1ad0..7d2c812892 100644
+--- a/apps/documenteditor/main/app_dev.js
++++ b/apps/documenteditor/main/app_dev.js
+@@ -133,6 +133,7 @@ require([
+         autoCreate: false,
+         controllers : [
+             'Viewport',
++            'Banshion',
+             'DocumentHolder',
+             'Toolbar',
+             'Statusbar',
+@@ -171,6 +172,7 @@ require([
+                 'common/main/lib/controller/Themes',
+                 'common/main/lib/controller/Desktop',
+                 'documenteditor/main/app/controller/Viewport',
++                'documenteditor/main/app/controller/Banshion',
+                 'documenteditor/main/app/controller/DocumentHolder',
+                 'documenteditor/main/app/controller/Toolbar',
+                 'documenteditor/main/app/controller/Links',

@@ -208,6 +208,18 @@ define([
             }
             this.fireEvent('editcomplete', this);
         },
+        onAutoFitClick: function(menu, item, e) {
+            if (this.api) {
+                switch (item.value) {
+                    case 0: this.api.autoFitToWindow(); break;
+                    case 1: this.api.autoFitToContent(); break;
+                    case 2: this.api.switchRowColumn(); break;
+                    case 3: this.api.asc_DistributeTableCells(false); break;
+                    case 4: this.api.asc_DistributeTableCells(true); break;
+                }
+            }
+            this.fireEvent('editcomplete', this);
+        },
 
         splitCells: function(menu, item, e) {
             var me = this;
@@ -381,6 +393,26 @@ define([
                 dataHintDirection: 'left',
                 dataHintOffset: 'small'
             });
+            this.btnAutoFit = new Common.UI.Button({
+                parentEl: $('#table-btn-auto-fit'),
+                cls         : 'btn-toolbar align-left',
+                iconCls     : 'toolbar__icon btn-menu-table',
+                caption     : this.autoFit,
+                style       : 'width: 100%;',
+                menu: new Common.UI.Menu({
+                    menuAlign: 'tr-br',
+                    items: [
+                        { caption: this.autoFitToWindowText, value: 0 },
+                        { caption: this.autoFitToContentText,  value: 1 },
+                        { caption: this.switchRowColumnText,  value: 2 },
+                        { caption: this.distributeRowsEvenlyText,  value: 3 },
+                        { caption: this.distributeColumnsEvenlyText,  value: 4 },
+                    ]
+                }),
+                dataHint    : '1',
+                dataHintDirection: 'left',
+                dataHintOffset: 'small'
+            });
             this.mnuMerge = this.btnEdit.menu.items[this.btnEdit.menu.items.length-2];
             this.mnuSplit = this.btnEdit.menu.items[this.btnEdit.menu.items.length-1];
 
@@ -391,7 +423,9 @@ define([
                 }
             }, this));
             this.btnEdit.menu.on('item:click', _.bind(this.onEditClick, this));
+            this.btnAutoFit.menu.on('item:click', _.bind(this.onAutoFitClick, this));
             this.lockedControls.push(this.btnEdit);
+            this.lockedControls.push(this.btnAutoFit);
 
             this.chRepeatRow = new Common.UI.CheckBox({
                 el: $('#table-checkbox-repeat-row'),
@@ -982,7 +1016,7 @@ define([
 
         disableControls: function(disable) {
             if (this._initSettings) return;
-            
+
             if (this._state.DisabledControls!==disable) {
                 this._state.DisabledControls = disable;
                 _.each(this.lockedControls, function(item) {
@@ -1001,10 +1035,14 @@ define([
             this.fireEvent('eyedropper', false);
         },
 
+        autoFit:            'AutoFit',
+        autoFitToWindowText: 'AutoFit to Window',
+        autoFitToContentText: 'AutoFit to Content',
         textBorders:        'Border\'s Style',
         textBorderColor:    'Color',
         textBackColor:      'Background color',
         textEdit:           'Rows & Columns',
+        switchRowColumnText     : 'Switch Row/Column',
         selectRowText           : 'Select Row',
         selectColumnText        : 'Select Column',
         selectCellText          : 'Select Cell',
@@ -1016,6 +1054,8 @@ define([
         deleteRowText           : 'Delete Row',
         deleteColumnText        : 'Delete Column',
         deleteTableText         : 'Delete Table',
+        distributeRowsEvenlyText: 'Distribute Rows Evenly',
+        distributeColumnsEvenlyText: 'Distribute Columns Evenly',
         mergeCellsText          : 'Merge Cells',
         splitCellsText          : 'Split Cell...',
         splitCellTitleText      : 'Split Cell',
