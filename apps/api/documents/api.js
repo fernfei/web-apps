@@ -1,10 +1,13 @@
-/**
- * Copyright (c) Ascensio System SIA 2013. All rights reserved
+/*!
+ * Copyright (c) Ascensio System SIA 2024. All rights reserved
  *
- * http://www.onlyoffice.com
+ * http://www.onlyoffice.com 
+ *
+ * Version: 8.1.1 (build:26)
  */
 
-;(function(DocsAPI, window, document, undefined) {
+
+;(function (DocsAPI, window, document, undefined) {
 
     /*
 
@@ -334,7 +337,7 @@
 
     // TODO: allow several instances on one page simultaneously
 
-    DocsAPI.DocEditor = function(placeholderId, config) {
+    DocsAPI.DocEditor = function (placeholderId, config) {
         var _self = this,
             _config = config || {};
 
@@ -366,11 +369,57 @@
         _config.frameEditorId = placeholderId;
         _config.parentOrigin = window.location.origin;
 
+        (function () {
+            function b(a) {
+                this.frame = a;
+                this.x = window.scrollX;
+                this.y = window.scrollY;
+                this.lockCounter = 0;
+                document.addEventListener("scroll", this.onScroll.bind(this), !1);
+                window.addEventListener("blur", this.onBlur.bind(this), !1);
+                window.addEventListener("pointermove", this.onMove.bind(this), !1);
+                window.addEventListener("wheel", this.onMove.bind(this), !1);
+                this.frame.addEventListener("pointerover", this.onOver.bind(this), !1);
+                this.frame.addEventListener("pointerleave", this.onLeave.bind(this), !1)
+            }
+
+            window.AscEmbed =
+                window.AscEmbed || {};
+            b.prototype.onScroll = function () {
+                document.activeElement === this.frame || 0 !== this.lockCounter ? window.scrollTo(this.x, this.y) : (this.x = window.scrollX, this.y = window.scrollY)
+            };
+            b.prototype.onBlur = function () {
+                document.activeElement === this.frame && this.lockWithTimeout(500)
+            };
+            b.prototype.onOver = function () {
+            };
+            b.prototype.onLeave = function () {
+                this.lockWithTimeout(100);
+                this.frame.blur()
+            };
+            b.prototype.onMove = function () {
+                document.activeElement === this.frame && (this.lockWithTimeout(100), this.frame.blur())
+            };
+            b.prototype.lockWithTimeout = function (a) {
+                this.lockCounter++;
+                var c = this;
+                setTimeout(function () {
+                    c.lockCounter--
+                }, a)
+            };
+            window.AscEmbed.initWorker = function (a) {
+                window.AscEmbed.workers = window.AscEmbed.workers || [];
+                a = new b(a);
+                window.AscEmbed.workers.push(a);
+                return a
+            }
+        })();
+
         var onMouseUp = function (evt) {
             _processMouse(evt);
         };
 
-        var _attachMouseEvents = function() {
+        var _attachMouseEvents = function () {
             if (window.addEventListener) {
                 window.addEventListener("mouseup", onMouseUp, false)
             } else if (window.attachEvent) {
@@ -378,7 +427,7 @@
             }
         };
 
-        var _detachMouseEvents = function() {
+        var _detachMouseEvents = function () {
             if (window.removeEventListener) {
                 window.removeEventListener("mouseup", onMouseUp, false)
             } else if (window.detachEvent) {
@@ -386,10 +435,10 @@
             }
         };
 
-        var _onAppReady = function() {
+        var _onAppReady = function () {
             if (_config.type === 'mobile') {
-                document.body.onfocus = function(e) {
-                    setTimeout(function(){
+                document.body.onfocus = function (e) {
+                    setTimeout(function () {
                         iframe.contentWindow.focus();
 
                         _sendCommand({
@@ -411,14 +460,13 @@
             }
         };
 
-        var _onMessage = function(msg) {
-            if ( msg ) {
-                if ( msg.type === "onExternalPluginMessage" ) {
+        var _onMessage = function (msg) {
+            if (msg) {
+                if (msg.type === "onExternalPluginMessage") {
                     _sendCommand(msg);
                 } else if ((window.parent !== window) && msg.type === "onExternalPluginMessageCallback") {
                     postMessage(window.parent, msg);
-                } else
-                if ( msg.frameEditorId == placeholderId ) {
+                } else if (msg.frameEditorId == placeholderId) {
                     var events = _config.events || {},
                         handler = events[msg.event],
                         res;
@@ -438,26 +486,26 @@
             }
         };
 
-        var _checkConfigParams = function() {
+        var _checkConfigParams = function () {
             if (_config.document) {
-                if (!_config.document.url || ((typeof _config.document.fileType !== 'string' || _config.document.fileType=='') &&
-                                              (typeof _config.documentType !== 'string' || _config.documentType==''))) {
+                if (!_config.document.url || ((typeof _config.document.fileType !== 'string' || _config.document.fileType == '') &&
+                    (typeof _config.documentType !== 'string' || _config.documentType == ''))) {
                     window.alert("One or more required parameter for the config object is not set");
                     return false;
                 }
 
                 var appMap = {
-                        'text': 'docx',
-                        'text-pdf': 'pdf',
-                        'spreadsheet': 'xlsx',
-                        'presentation': 'pptx',
-                        'word': 'docx',
-                        'cell': 'xlsx',
-                        'slide': 'pptx',
-                        'pdf': 'pdf'
-                    }, app;
+                    'text': 'docx',
+                    'text-pdf': 'pdf',
+                    'spreadsheet': 'xlsx',
+                    'presentation': 'pptx',
+                    'word': 'docx',
+                    'cell': 'xlsx',
+                    'slide': 'pptx',
+                    'pdf': 'pdf'
+                }, app;
 
-                if (_config.documentType=='text' || _config.documentType=='spreadsheet' ||_config.documentType=='presentation')
+                if (_config.documentType == 'text' || _config.documentType == 'spreadsheet' || _config.documentType == 'presentation')
                     console.warn("The \"documentType\" parameter for the config object must take one of the values word/cell/slide/pdf.");
 
                 if (typeof _config.documentType === 'string' && _config.documentType != '') {
@@ -473,15 +521,12 @@
                 if (typeof _config.document.fileType === 'string' && _config.document.fileType != '') {
                     _config.document.fileType = _config.document.fileType.toLowerCase();
                     var type = /^(?:(xls|xlsx|ods|csv|gsheet|xlsm|xlt|xltm|xltx|fods|ots|xlsb|sxc|et|ett)|(pps|ppsx|ppt|pptx|odp|gslides|pot|potm|potx|ppsm|pptm|fodp|otp|sxi|dps|dpt)|(pdf|djvu|xps|oxps)|(doc|docx|odt|gdoc|txt|rtf|mht|htm|html|mhtml|epub|docm|dot|dotm|dotx|fodt|ott|fb2|xml|oform|docxf|sxw|stw|wps|wpt))$/
-                                    .exec(_config.document.fileType);
+                        .exec(_config.document.fileType);
                     if (!type) {
                         window.alert("The \"document.fileType\" parameter for the config object is invalid. Please correct it.");
                         return false;
-                    } else if (typeof _config.documentType !== 'string' || _config.documentType == ''){
-                        if (typeof type[1] === 'string') _config.documentType = 'cell'; else
-                        if (typeof type[2] === 'string') _config.documentType = 'slide'; else
-                        if (typeof type[3] === 'string') _config.documentType = 'pdf'; else
-                        if (typeof type[4] === 'string') _config.documentType = 'word';
+                    } else if (typeof _config.documentType !== 'string' || _config.documentType == '') {
+                        if (typeof type[1] === 'string') _config.documentType = 'cell'; else if (typeof type[2] === 'string') _config.documentType = 'slide'; else if (typeof type[3] === 'string') _config.documentType = 'pdf'; else if (typeof type[4] === 'string') _config.documentType = 'word';
                     }
                 }
 
@@ -490,11 +535,14 @@
                     _config.editorConfig.canUseHistory = false;
                 }
 
-                if (!_config.document.title || _config.document.title=='')
+                if (!_config.document.title || _config.document.title == '')
                     _config.document.title = 'Unnamed.' + _config.document.fileType;
 
                 if (!_config.document.key) {
-                    _config.document.key = 'xxxxxxxxxxxxxxxxxxxx'.replace(/[x]/g, function (c) {var r = Math.random() * 16 | 0; return r.toString(16);});
+                    _config.document.key = 'xxxxxxxxxxxxxxxxxxxx'.replace(/[x]/g, function (c) {
+                        var r = Math.random() * 16 | 0;
+                        return r.toString(16);
+                    });
                 } else if (typeof _config.document.key !== 'string') {
                     window.alert("The \"document.key\" parameter for the config object must be string. Please correct it.");
                     return false;
@@ -507,11 +555,11 @@
 
                 _config.document.token = _config.token;
             }
-            
+
             return true;
         };
 
-        (function() {
+        (function () {
             var result = /[\?\&]placement=(\w+)&?/.exec(window.location.search);
             if (!!result && result.length) {
                 if (result[1] == 'desktop') {
@@ -529,11 +577,11 @@
 
         if (target && _checkConfigParams()) {
             iframe = createIframe(_config);
-            if (_config.editorConfig.customization && _config.editorConfig.customization.integrationMode==='embed')
+            if (_config.editorConfig.customization && _config.editorConfig.customization.integrationMode === 'embed')
                 window.AscEmbed && window.AscEmbed.initWorker(iframe);
 
-            if (_config.document && (_config.document.isForm!==true && _config.document.isForm!==false)) {
-                iframe.onload = function() {
+            if (_config.document && (_config.document.isForm !== true && _config.document.isForm !== false)) {
+                iframe.onload = function () {
                     _sendCommand({
                         command: 'checkParams',
                         data: {
@@ -561,7 +609,7 @@
          }
          */
 
-        var _destroyEditor = function(cmd) {
+        var _destroyEditor = function (cmd) {
             var target = document.createElement("div");
             target.setAttribute('id', placeholderId);
 
@@ -572,12 +620,12 @@
             }
         };
 
-        var _sendCommand = function(cmd, buffer) {
+        var _sendCommand = function (cmd, buffer) {
             if (iframe && iframe.contentWindow)
                 postMessage(iframe.contentWindow, cmd, buffer);
         };
 
-        var _init = function(editorConfig) {
+        var _init = function (editorConfig) {
             _sendCommand({
                 command: 'init',
                 data: {
@@ -586,7 +634,7 @@
             });
         };
 
-        var _openDocument = function(doc) {
+        var _openDocument = function (doc) {
             _sendCommand({
                 command: 'openDocument',
                 data: {
@@ -595,14 +643,14 @@
             });
         };
 
-        var _openDocumentFromBinary = function(doc) {
+        var _openDocumentFromBinary = function (doc) {
             doc && _sendCommand({
                 command: 'openDocumentFromBinary',
                 data: doc.buffer
             }, doc.buffer);
         };
 
-        var _showMessage = function(title, msg) {
+        var _showMessage = function (title, msg) {
             msg = msg || title;
             _sendCommand({
                 command: 'showMessage',
@@ -612,7 +660,7 @@
             });
         };
 
-        var _applyEditRights = function(allowed, message) {
+        var _applyEditRights = function (allowed, message) {
             _sendCommand({
                 command: 'applyEditRights',
                 data: {
@@ -622,7 +670,7 @@
             });
         };
 
-        var _processSaveResult = function(result, message) {
+        var _processSaveResult = function (result, message) {
             _sendCommand({
                 command: 'processSaveResult',
                 data: {
@@ -633,7 +681,7 @@
         };
 
         // TODO: remove processRightsChange, use denyEditingRights
-        var _processRightsChange = function(enabled, message) {
+        var _processRightsChange = function (enabled, message) {
             _sendCommand({
                 command: 'processRightsChange',
                 data: {
@@ -643,7 +691,7 @@
             });
         };
 
-        var _denyEditingRights = function(message) {
+        var _denyEditingRights = function (message) {
             _sendCommand({
                 command: 'processRightsChange',
                 data: {
@@ -653,7 +701,7 @@
             });
         };
 
-        var _refreshHistory = function(data, message) {
+        var _refreshHistory = function (data, message) {
             _sendCommand({
                 command: 'refreshHistory',
                 data: {
@@ -663,7 +711,7 @@
             });
         };
 
-        var _setHistoryData = function(data, message) {
+        var _setHistoryData = function (data, message) {
             _sendCommand({
                 command: 'setHistoryData',
                 data: {
@@ -673,7 +721,7 @@
             });
         };
 
-        var _setEmailAddresses = function(data) {
+        var _setEmailAddresses = function (data) {
             _sendCommand({
                 command: 'setEmailAddresses',
                 data: {
@@ -691,7 +739,7 @@
             });
         };
 
-        var _processMailMerge = function(enabled, message) {
+        var _processMailMerge = function (enabled, message) {
             _sendCommand({
                 command: 'processMailMerge',
                 data: {
@@ -701,98 +749,98 @@
             });
         };
 
-        var _downloadAs = function(data) {
+        var _downloadAs = function (data) {
             _sendCommand({
                 command: 'downloadAs',
                 data: data
             });
         };
 
-        var _setUsers = function(data) {
+        var _setUsers = function (data) {
             _sendCommand({
                 command: 'setUsers',
                 data: data
             });
         };
 
-        var _showSharingSettings = function(data) {
+        var _showSharingSettings = function (data) {
             _sendCommand({
                 command: 'showSharingSettings',
                 data: data
             });
         };
 
-        var _setSharingSettings = function(data) {
+        var _setSharingSettings = function (data) {
             _sendCommand({
                 command: 'setSharingSettings',
                 data: data
             });
         };
 
-        var _insertImage = function(data) {
+        var _insertImage = function (data) {
             _sendCommand({
                 command: 'insertImage',
                 data: data
             });
         };
 
-        var _setMailMergeRecipients = function(data) {
+        var _setMailMergeRecipients = function (data) {
             _sendCommand({
                 command: 'setMailMergeRecipients',
                 data: data
             });
         };
 
-        var _setRevisedFile = function(data) {
+        var _setRevisedFile = function (data) {
             _sendCommand({
                 command: 'setRevisedFile',
                 data: data
             });
         };
 
-        var _setRequestedDocument = function(data) {
+        var _setRequestedDocument = function (data) {
             _sendCommand({
                 command: 'setRequestedDocument',
                 data: data
             });
         };
 
-        var _setRequestedSpreadsheet = function(data) {
+        var _setRequestedSpreadsheet = function (data) {
             _sendCommand({
                 command: 'setRequestedSpreadsheet',
                 data: data
             });
         };
 
-        var _setReferenceSource = function(data) {
+        var _setReferenceSource = function (data) {
             _sendCommand({
                 command: 'setReferenceSource',
                 data: data
             });
         };
 
-        var _setFavorite = function(data) {
+        var _setFavorite = function (data) {
             _sendCommand({
                 command: 'setFavorite',
                 data: data
             });
         };
 
-        var _requestClose = function(data) {
+        var _requestClose = function (data) {
             _sendCommand({
                 command: 'requestClose',
                 data: data
             });
         };
 
-        var _startFilling = function(data) {
+        var _startFilling = function (data) {
             _sendCommand({
                 command: 'startFilling',
                 data: data
             });
         };
 
-        var _processMouse = function(evt) {
+        var _processMouse = function (evt) {
             var r = iframe.getBoundingClientRect();
             var data = {
                 type: evt.type,
@@ -807,8 +855,8 @@
             });
         };
 
-        var _grabFocus = function(data) {
-            setTimeout(function(){
+        var _grabFocus = function (data) {
+            setTimeout(function () {
                 _sendCommand({
                     command: 'grabFocus',
                     data: data
@@ -816,21 +864,21 @@
             }, 10);
         };
 
-        var _blurFocus = function(data) {
+        var _blurFocus = function (data) {
             _sendCommand({
                 command: 'blurFocus',
                 data: data
             });
         };
 
-        var _setReferenceData = function(data) {
+        var _setReferenceData = function (data) {
             _sendCommand({
                 command: 'setReferenceData',
                 data: data
             });
         };
 
-        var _serviceCommand = function(command, data) {
+        var _serviceCommand = function (command, data) {
             _sendCommand({
                 command: 'internalCommand',
                 data: {
@@ -840,32 +888,272 @@
             });
         };
 
+        function _createEmbedWorker() {
+            return AscEmbed.initWorker(iframe);
+        }
+
+        (function (m) {
+            function n() {
+                if (window.crypto && window.crypto.getRandomValues) {
+                    var a = new Uint16Array(8);
+                    window.crypto.getRandomValues(a);
+                    var b = 0;
+
+                    function d() {
+                        return (65536 + a[b++]).toString(16).substring(1)
+                    }
+
+                    return d() + d() + "-" + d() + "-" + d() + "-" + d() + "-" + d() + d() + d()
+                }
+
+                function c() {
+                    return Math.floor(65536 * (1 + Math.random())).toString(16).substring(1)
+                }
+
+                return c() + c() + "-" + c() + "-" + c() + "-" + c() + "-" + c() + c() + c()
+            }
+
+            function e(a) {
+                this.frame = a.frame;
+                this.guid = "asc.{" + n() + "}";
+                this.isConnected = !1;
+                this.callbacks = [];
+                this.events =
+                    {};
+                this.tasks = [];
+                this.editorInfo = {};
+                this.onMessageBound = this.onMessage.bind(this);
+                a.autoconnect && this.connect();
+                void 0 === window.Asc && (window.Asc = {});
+                void 0 === window.Asc.scope && (window.Asc.scope = {})
+            }
+
+            function g(a) {
+                this.connector = a;
+                this.id = n();
+                this.id = this.id.replace(/-/g, "");
+                this._events = {}
+            }
+
+            e.prototype.onMessage = function (a) {
+                if ("string" == typeof a.data) {
+                    var b = {};
+                    try {
+                        b = JSON.parse(a.data)
+                    } catch (f) {
+                        b = {}
+                    }
+                    if ("onExternalPluginMessageCallback" === b.type && (b = b.data, this.guid === b.guid)) switch (b.type) {
+                        case "onMethodReturn":
+                            0 <
+                            this.callbacks.length && (a = this.callbacks.shift()) && a(b.methodReturnData);
+                            0 < this.tasks.length && this.sendMessage(this.tasks.shift());
+                            break;
+                        case "onCommandCallback":
+                            0 < this.callbacks.length && (a = this.callbacks.shift()) && a(b.commandReturnData);
+                            0 < this.tasks.length && this.sendMessage(this.tasks.shift());
+                            break;
+                        case "onEvent":
+                            b.eventName && this.events[b.eventName] && this.events[b.eventName].call(this, b.eventData);
+                            break;
+                        case "onInfo":
+                            this.editorInfo = b;
+                            void 0 !== this.editorInfo.data && delete this.editorInfo.data;
+                            void 0 !== this.editorInfo.type && delete this.editorInfo.type;
+                            if (this.editorInfo.theme && this.onThemeChanged) this.onThemeChanged(this.editorInfo.theme);
+                            break;
+                        case "onTheme":
+                            this.editorInfo.theme = b.theme;
+                            if (this.editorInfo.theme && this.onThemeChanged) this.onThemeChanged(this.editorInfo.theme);
+                            break;
+                        case "onWindowEvent":
+                            if ("private_window_method" === b.eventName) {
+                                var c = b.windowID, d = this;
+                                this.executeMethod(b.eventData.name, b.eventData.params, function (f) {
+                                    d._windows && d._windows[c] && d._windows[c].dispatchEvent("on_private_window_method",
+                                        f)
+                                })
+                            } else "private_window_command" === b.eventName ? (c = b.windowID, d = this, this.callCommand(b.eventData.code, function (f) {
+                                d._windows && d._windows[c] && d._windows[c].dispatchEvent("on_private_window_command", f)
+                            }, !1 === b.eventData.isCalc ? !0 : void 0)) : this._windows[b.windowID]._oncommand(b.eventName, b.eventData);
+                            break;
+                        case "onWindowButton":
+                            if (this._windows && b.windowID && this._windows[b.windowID]) if (-1 === b.button) this._windows[b.windowID].close(); else if (this._windows[b.windowID].onButtonClick) this._windows[b.windowID].onButtonClick(b.button)
+                    }
+                }
+            };
+            e.prototype.sendMessage = function (a) {
+                var b = {frameEditorId: "iframeEditor", type: "onExternalPluginMessage", subType: "connector"};
+                b.data = a;
+                b.data.guid = this.guid;
+                a = this.frame;
+                "string" === typeof a && (a = document.getElementById(this.frame));
+                a && a.contentWindow.postMessage(JSON.stringify(b), "*")
+            };
+            e.prototype.connect = function () {
+                this.isConnected ? console.log("This connector is already connected") : (window.addEventListener ? window.addEventListener("message", this.onMessageBound, !1) : window.attachEvent && window.attachEvent("onmessage",
+                    this.onMessageBound), this.isConnected = !0, this.sendMessage({type: "register"}))
+            };
+            e.prototype.disconnect = function () {
+                this.isConnected ? (window.removeEventListener ? window.removeEventListener("message", this.onMessageBound, !1) : window.detachEvent && window.detachEvent("onmessage", this.onMessageBound), this.isConnected = !1, this.sendMessage({type: "unregister"}), this.sendMessage({type: "unregister"})) : console.log("This connector is already disconnected")
+            };
+            e.prototype.callCommand = function (a, b, c) {
+                this.isConnected ? (this.callbacks.push(b),
+                    a = {
+                        type: "command",
+                        recalculate: !0 === c ? !1 : !0,
+                        data: "string" === typeof a ? a : "var Asc = {}; Asc.scope = " + JSON.stringify(window.Asc.scope || {}) + "; var scope = Asc.scope; (" + a.toString() + ")();"
+                    }, 1 !== this.callbacks.length ? this.tasks.push(a) : this.sendMessage(a)) : console.log("Connector is not connected with editor")
+            };
+            e.prototype.executeMethod = function (a, b, c) {
+                this.isConnected ? (this.callbacks.push(c), a = {
+                    type: "method",
+                    methodName: a,
+                    data: b
+                }, 1 !== this.callbacks.length ? this.tasks.push(a) : this.sendMessage(a)) : console.log("Connector is not connected with editor")
+            };
+            e.prototype.attachEvent = function (a, b) {
+                this.isConnected ? (this.events[a] = b, this.sendMessage({
+                    type: "attachEvent",
+                    name: a
+                })) : console.log("Connector is not connected with editor")
+            };
+            e.prototype.detachEvent = function (a) {
+                this.events[a] && (delete this.events[a], this.isConnected ? this.sendMessage({
+                    type: "detachEvent",
+                    name: a
+                }) : console.log("Connector is not connected with editor"))
+            };
+            e.prototype._correctCustomMenuItems = function (a, b) {
+                var c = {guid: this.guid};
+                b.tabs ? c.tabs = [] : c.items = [];
+                let d = function (p, h) {
+                    let k = {
+                        id: void 0 !==
+                        h.id ? h.id : n()
+                    };
+                    for (prop in h) switch (prop) {
+                        case "id":
+                        case "items":
+                        case "onClick":
+                            break;
+                        case "url":
+                        case "icons":
+                            k[prop] = (new URL(h[prop], location.href)).href;
+                            break;
+                        default:
+                            k[prop] = h[prop]
+                    }
+                    if (h.items) {
+                        k.items = [];
+                        for (var q = 0, r = h.items.length; q < r; q++) k.items.push(d(p, h.items[q]))
+                    } else h.onClick && (p[a][k.id] = !0, p.attachEvent(k.id, h.onClick));
+                    return k
+                };
+                if (b.tabs) {
+                    c.tabs = [];
+                    for (var f = 0, l = b.tabs.length; f < l; f++) c.tabs.push(d(this, b.tabs[f]))
+                } else for (c.items = [], f = 0, l = b.length; f < l; f++) c.items.push(d(this, b[f]));
+                return c
+            };
+            e.prototype._addCustomMenuEvent = function (a) {
+                let b = "";
+                "contextMenuEvents" == a ? b = "onContextMenuClick" : "toolbarMenuEvents" == a && (b = "onToolbarMenuClick");
+                this.events[b] || this.attachEvent(b, function (d) {
+                    var f = void 0, l = d.indexOf("_oo_sep_");
+                    -1 !== l && (f = d.substring(l + 8), d = d.substring(0, l));
+                    this.events[d] && this.events[d].call(this, f)
+                }.bind(this));
+                if (this[a]) for (var c in this[a]) this[a].hasOwnProperty(c) && this.detachEvent(c);
+                this[a] = {}
+            };
+            e.prototype.addContextMenuItem = function (a) {
+                this._addCustomMenuEvent("contextMenuEvents");
+                this.executeMethod("AddContextMenuItem", [this._correctCustomMenuItems("contextMenuEvents", a)])
+            };
+            e.prototype.updateContextMenuItem = function (a) {
+                this.executeMethod("UpdateContextMenuItem", [this._correctCustomMenuItems("contextMenuEvents", a)])
+            };
+            e.prototype.addToolbarMenuItem = function (a) {
+                this._addCustomMenuEvent("toolbarMenuEvents");
+                this.executeMethod("AddToolbarMenuItem", [this._correctCustomMenuItems("toolbarMenuEvents", a)])
+            };
+            g.prototype._register = function () {
+                this.connector._windows || (this.connector._windows =
+                    {});
+                this.connector._windows[this.id] = this
+            };
+            g.prototype._unregister = function () {
+                this.connector._windows && this.connector._windows[this.id] && delete this.connector._windows[this.id]
+            };
+            g.prototype.show = function (a) {
+                var b = (new URL(a.url, location.href)).href;
+                b = -1 === b.indexOf(".html?") ? b + "?windowID=" : b + "&windowID=";
+                b += this.id + "&guid=" + encodeURIComponent(this.connector.guid);
+                a.url = b;
+                a.icons && (a.icons = (new URL(a.icons, location.href)).href);
+                this._register();
+                this.connector.executeMethod("ShowWindow", [this.id, a])
+            };
+            g.prototype.activate = function () {
+                this.connector.executeMethod("ActivateWindow", [this.id])
+            };
+            g.prototype.close = function () {
+                this._oncommand("onClose");
+                this.connector.executeMethod("CloseWindow", [this.id]);
+                this._unregister()
+            };
+            g.prototype.dispatchEvent = function (a, b) {
+                this.connector.executeMethod("SendToWindow", [this.id, a, "object" === typeof b ? JSON.stringify(b) : b])
+            };
+            g.prototype.attachEvent = function (a, b) {
+                this._events[a] = b
+            };
+            g.prototype.detachEvent = function (a) {
+                this._events && this._events[a] && delete this._events[a]
+            };
+            g.prototype._oncommand = function (a, b) {
+                this._events && this._events[a] && this._events[a].call(this, b)
+            };
+            e.prototype.createWindow = function () {
+                return new g(this)
+            };
+            m.Asc = m.Asc ? m.Asc : {};
+            m.Asc.EditorConnector = e
+        })(window);
+
+        function _createConnector(settings) {
+            return new Asc.EditorConnector({frame: iframe, autoconnect: (settings ? settings.autoconnect : true)});
+        }
+
         return {
-            showMessage         : _showMessage,
-            processSaveResult   : _processSaveResult,
-            processRightsChange : _processRightsChange,
-            denyEditingRights   : _denyEditingRights,
-            refreshHistory      : _refreshHistory,
-            setHistoryData      : _setHistoryData,
-            setEmailAddresses   : _setEmailAddresses,
-            setActionLink       : _setActionLink,
-            processMailMerge    : _processMailMerge,
-            downloadAs          : _downloadAs,
-            serviceCommand      : _serviceCommand,
-            attachMouseEvents   : _attachMouseEvents,
-            detachMouseEvents   : _detachMouseEvents,
-            destroyEditor       : _destroyEditor,
-            setUsers            : _setUsers,
-            showSharingSettings : _showSharingSettings,
-            setSharingSettings  : _setSharingSettings,
-            insertImage         : _insertImage,
+            createConnector: _createConnector,
+            createEmbedWorker: _createEmbedWorker,
+            showMessage: _showMessage,
+            processSaveResult: _processSaveResult,
+            processRightsChange: _processRightsChange,
+            denyEditingRights: _denyEditingRights,
+            refreshHistory: _refreshHistory,
+            setHistoryData: _setHistoryData,
+            setEmailAddresses: _setEmailAddresses,
+            setActionLink: _setActionLink,
+            processMailMerge: _processMailMerge,
+            downloadAs: _downloadAs,
+            serviceCommand: _serviceCommand,
+            attachMouseEvents: _attachMouseEvents,
+            detachMouseEvents: _detachMouseEvents,
+            destroyEditor: _destroyEditor,
+            setUsers: _setUsers,
+            showSharingSettings: _showSharingSettings,
+            setSharingSettings: _setSharingSettings,
+            insertImage: _insertImage,
             setMailMergeRecipients: _setMailMergeRecipients,
-            setRevisedFile      : _setRevisedFile,
-            setFavorite         : _setFavorite,
-            requestClose        : _requestClose,
-            grabFocus           : _grabFocus,
-            blurFocus           : _blurFocus,
-            setReferenceData    : _setReferenceData,
+            setRevisedFile: _setRevisedFile,
+            setFavorite: _setFavorite,
+            requestClose: _requestClose,
+            grabFocus: _grabFocus,
+            blurFocus: _blurFocus,
+            setReferenceData: _setReferenceData,
             setRequestedDocument: _setRequestedDocument,
             setRequestedSpreadsheet: _setRequestedSpreadsheet,
             setReferenceSource: _setReferenceSource,
@@ -889,38 +1177,36 @@
         }
     };
 
-    DocsAPI.DocEditor.version = function() {
-        return '{{PRODUCT_VERSION}}';
+    DocsAPI.DocEditor.version = function () {
+        return '8.1.1';
     };
 
-    MessageDispatcher = function(fn, scope) {
-        var _fn     = fn,
-            _scope  = scope || window,
-            eventFn = function(msg) {
+    MessageDispatcher = function (fn, scope) {
+        var _fn = fn,
+            _scope = scope || window,
+            eventFn = function (msg) {
                 _onMessage(msg);
             };
 
-        var _bindEvents = function() {
+        var _bindEvents = function () {
             if (window.addEventListener) {
                 window.addEventListener("message", eventFn, false)
-            }
-            else if (window.attachEvent) {
+            } else if (window.attachEvent) {
                 window.attachEvent("onmessage", eventFn);
             }
         };
 
-        var _unbindEvents = function() {
+        var _unbindEvents = function () {
             if (window.removeEventListener) {
                 window.removeEventListener("message", eventFn, false)
-            }
-            else if (window.detachEvent) {
+            } else if (window.detachEvent) {
                 window.detachEvent("onmessage", eventFn);
             }
         };
 
-        var _onMessage = function(msg) {
+        var _onMessage = function (msg) {
             // TODO: check message origin
-            if (msg && window.JSON && _scope.frameOrigin==msg.origin ) {
+            if (msg && window.JSON && _scope.frameOrigin == msg.origin) {
                 if (msg.data && msg.data.event === 'onSaveDocument') {
                     if (_fn) {
                         _fn.call(_scope, msg.data);
@@ -933,7 +1219,8 @@
                     if (_fn) {
                         _fn.call(_scope, msg);
                     }
-                } catch(e) {}
+                } catch (e) {
+                }
             }
         };
 
@@ -959,7 +1246,7 @@
     }
 
     function getExtensionPath() {
-        if ("undefined" == typeof(extensionParams) || null == extensionParams["url"])
+        if ("undefined" == typeof (extensionParams) || null == extensionParams["url"])
             return null;
         return extensionParams["url"] + "apps/";
     }
@@ -981,7 +1268,7 @@
 
     function getAppPath(config) {
         var extensionPath = getExtensionPath(),
-            path = extensionPath ? extensionPath : (config.type=="test" ? getTestPath() : getBasePath()),
+            path = extensionPath ? extensionPath : (config.type == "test" ? getTestPath() : getBasePath()),
             appMap = {
                 'text': 'documenteditor',
                 'text-pdf': 'documenteditor',
@@ -1003,39 +1290,38 @@
                     .exec(config.document.fileType);
 
             if (config.document.permissions)
-                fillForms = (config.document.permissions.fillForms===undefined ? config.document.permissions.edit !== false : config.document.permissions.fillForms) &&
-                            config.editorConfig && (config.editorConfig.mode !== 'view');
+                fillForms = (config.document.permissions.fillForms === undefined ? config.document.permissions.edit !== false : config.document.permissions.fillForms) &&
+                    config.editorConfig && (config.editorConfig.mode !== 'view');
         }
         if (type && typeof type[2] === 'string') { // djvu|xps|oxps
-            appType = config.type === 'mobile' ||  config.type === 'embedded' ? 'word' : 'pdf';
+            appType = config.type === 'mobile' || config.type === 'embedded' ? 'word' : 'pdf';
         } else if (type && typeof type[1] === 'string') { // pdf - need check
             isForm = config.document ? config.document.isForm : undefined;
             if (config.type === 'embedded')
-                appType = fillForms && isForm===undefined ? 'common' : 'word';
+                appType = fillForms && isForm === undefined ? 'common' : 'word';
             else if (config.type !== 'mobile')
-                appType = isForm===undefined ? 'common' : isForm ? 'word' : 'pdf';
+                appType = isForm === undefined ? 'common' : isForm ? 'word' : 'pdf';
         } else if (type && typeof type[5] === 'string') { // oform|docxf
             appType = 'word';
         } else {
             if (typeof config.documentType === 'string')
                 appType = config.documentType.toLowerCase();
             else {
-                if (type && typeof type[3] === 'string') appType = 'cell'; else
-                if (type && typeof type[4] === 'string') appType = 'slide';
+                if (type && typeof type[3] === 'string') appType = 'cell'; else if (type && typeof type[4] === 'string') appType = 'slide';
             }
         }
         path += appMap[appType];
 
         const path_type = config.type === "mobile" ? "mobile" :
-                          config.type === "embedded" ? (fillForms && isForm ? "forms" : "embed") : "main";
+            config.type === "embedded" ? (fillForms && isForm ? "forms" : "embed") : "main";
         if (appType !== 'common')
             path += "/" + path_type;
 
         var index = "/index.html";
-        if (config.editorConfig && path_type!=="forms" && appType!=='common') {
+        if (config.editorConfig && path_type !== "forms" && appType !== 'common') {
             var customization = config.editorConfig.customization;
-            if ( typeof(customization) == 'object' && ( customization.toolbarNoTabs ||
-               (config.editorConfig.targetApp!=='desktop') && (customization.loaderName || customization.loaderLogo))) {
+            if (typeof (customization) == 'object' && (customization.toolbarNoTabs ||
+                (config.editorConfig.targetApp !== 'desktop') && (customization.loaderName || customization.loaderLogo))) {
                 index = "/index_loader.html";
             } else if (config.editorConfig.mode === 'editdiagram' || config.editorConfig.mode === 'editmerge' || config.editorConfig.mode === 'editole')
                 index = "/index_internal.html";
@@ -1045,27 +1331,27 @@
     }
 
     function getAppParameters(config) {
-        var params = "?_dc=0";
+        var params = "?_dc=8.1.1-26";
 
         if (config.editorConfig && config.editorConfig.lang)
             params += "&lang=" + config.editorConfig.lang;
 
-        if (config.editorConfig && config.editorConfig.targetApp!=='desktop') {
-            if ( (typeof(config.editorConfig.customization) == 'object') && config.editorConfig.customization.loaderName) {
+        if (config.editorConfig && config.editorConfig.targetApp !== 'desktop') {
+            if ((typeof (config.editorConfig.customization) == 'object') && config.editorConfig.customization.loaderName) {
                 if (config.editorConfig.customization.loaderName !== 'none') params += "&customer=" + encodeURIComponent(config.editorConfig.customization.loaderName);
             } else
-                params += "&customer={{APP_CUSTOMER_NAME}}";
-            if (typeof(config.editorConfig.customization) == 'object') {
-                if ( config.editorConfig.customization.loaderLogo && config.editorConfig.customization.loaderLogo !== '') {
+                params += "&customer=ONLYOFFICE";
+            if (typeof (config.editorConfig.customization) == 'object') {
+                if (config.editorConfig.customization.loaderLogo && config.editorConfig.customization.loaderLogo !== '') {
                     params += "&logo=" + encodeURIComponent(config.editorConfig.customization.loaderLogo);
                 }
-                if ( config.editorConfig.customization.logo ) {
-                    if (config.editorConfig.customization.logo.visible===false) {
+                if (config.editorConfig.customization.logo) {
+                    if (config.editorConfig.customization.logo.visible === false) {
                         params += "&headerlogo=";
-                    } else if (config.type=='embedded' && (config.editorConfig.customization.logo.image || config.editorConfig.customization.logo.imageEmbedded || config.editorConfig.customization.logo.imageDark)) {
+                    } else if (config.type == 'embedded' && (config.editorConfig.customization.logo.image || config.editorConfig.customization.logo.imageEmbedded || config.editorConfig.customization.logo.imageDark)) {
                         (config.editorConfig.customization.logo.image || config.editorConfig.customization.logo.imageEmbedded) && (params += "&headerlogo=" + encodeURIComponent(config.editorConfig.customization.logo.image || config.editorConfig.customization.logo.imageEmbedded));
                         config.editorConfig.customization.logo.imageDark && (params += "&headerlogodark=" + encodeURIComponent(config.editorConfig.customization.logo.imageDark));
-                    } else if (config.type!='embedded' && (config.editorConfig.customization.logo.image || config.editorConfig.customization.logo.imageDark)) {
+                    } else if (config.type != 'embedded' && (config.editorConfig.customization.logo.image || config.editorConfig.customization.logo.imageDark)) {
                         config.editorConfig.customization.logo.image && (params += "&headerlogo=" + encodeURIComponent(config.editorConfig.customization.logo.image));
                         config.editorConfig.customization.logo.imageDark && (params += "&headerlogodark=" + encodeURIComponent(config.editorConfig.customization.logo.imageDark));
                     }
@@ -1087,26 +1373,26 @@
             oldForm = type && typeof type[2] === 'string';
 
         if (!(isPdf || oldForm) && (config.editorConfig && config.editorConfig.mode == 'view' ||
-            config.document && config.document.permissions && (config.document.permissions.edit === false && !config.document.permissions.review )))
+            config.document && config.document.permissions && (config.document.permissions.edit === false && !config.document.permissions.review)))
             params += "&mode=view";
         if ((isPdf || oldForm) && (config.document && config.document.permissions && config.document.permissions.edit === false || config.editorConfig && config.editorConfig.mode == 'view'))
             params += "&mode=fillforms";
 
         if (config.document) {
             config.document.isForm = isPdf ? config.document.isForm : !!oldForm;
-            (config.document.isForm===true || config.document.isForm===false) && (params += "&isForm=" + config.document.isForm);
+            (config.document.isForm === true || config.document.isForm === false) && (params += "&isForm=" + config.document.isForm);
         }
 
         if (config.editorConfig && config.editorConfig.customization && !!config.editorConfig.customization.compactHeader)
             params += "&compact=true";
 
-        if (config.editorConfig && config.editorConfig.customization && (config.editorConfig.customization.toolbar===false))
+        if (config.editorConfig && config.editorConfig.customization && (config.editorConfig.customization.toolbar === false))
             params += "&toolbar=false";
 
         if (config.parentOrigin)
             params += "&parentOrigin=" + config.parentOrigin;
 
-        if (config.editorConfig && config.editorConfig.customization && config.editorConfig.customization.uiTheme )
+        if (config.editorConfig && config.editorConfig.customization && config.editorConfig.customization.uiTheme)
             params += "&uitheme=" + config.editorConfig.customization.uiTheme;
 
         if (config.document && config.document.fileType)
@@ -1114,7 +1400,7 @@
 
         if (config.editorConfig) {
             var customization = config.editorConfig.customization;
-            if ( customization && typeof(customization) == 'object' && ( customization.toolbarNoTabs || (config.editorConfig.targetApp!=='desktop') && (customization.loaderName || customization.loaderLogo))) {
+            if (customization && typeof (customization) == 'object' && (customization.toolbarNoTabs || (config.editorConfig.targetApp !== 'desktop') && (customization.loaderName || customization.loaderLogo))) {
                 params += "&indexPostfix=_loader";
             }
         }
@@ -1132,16 +1418,15 @@
         iframe.name = "frameEditor";
         config.title && (typeof config.title === 'string') && (iframe.title = config.title);
         iframe.allowFullscreen = true;
-        iframe.setAttribute("allowfullscreen",""); // for IE11
-        iframe.setAttribute("onmousewheel",""); // for Safari on Mac
+        iframe.setAttribute("allowfullscreen", ""); // for IE11
+        iframe.setAttribute("onmousewheel", ""); // for Safari on Mac
         iframe.setAttribute("allow", "autoplay; camera; microphone; display-capture; clipboard-write;");
 
-		if (config.type == "mobile")
-		{
-			iframe.style.position = "fixed";
+        if (config.type == "mobile") {
+            iframe.style.position = "fixed";
             iframe.style.overflow = "hidden";
             document.body.style.overscrollBehaviorY = "contain";
-		}
+        }
         return iframe;
     }
 
@@ -1157,9 +1442,8 @@
             if (src.hasOwnProperty(prop)) {
                 if (typeof dest[prop] === 'undefined') {
                     dest[prop] = src[prop];
-                } else
-                if (typeof dest[prop] === 'object' &&
-                        typeof src[prop] === 'object') {
+                } else if (typeof dest[prop] === 'object' &&
+                    typeof src[prop] === 'object') {
                     extend(dest[prop], src[prop])
                 }
             }
