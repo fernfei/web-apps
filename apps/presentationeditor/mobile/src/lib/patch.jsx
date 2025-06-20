@@ -1,53 +1,23 @@
 import React from 'react';
-import {Link, Icon, f7} from 'framework7-react';
+import {Link} from 'framework7-react';
 import {
     AddCommentController,
     EditCommentController
 } from "../../../../common/mobile/lib/controller/collaboration/Comments";
 import { Device } from "../../../../common/mobile/utils/device";
+import SvgIcon from '@common/lib/component/SvgIcon'
+import IconRedoForAndroid from '@common-android-icons/icon-redo.svg';
+import IconUndoForAndroid from '@common-android-icons/icon-undo.svg';
+import IconEditSettingsForAndroid from '@common-android-icons/icon-edit-settings.svg';
+import IconPlusForAndroid from '@common-android-icons/icon-plus.svg';
+import IconRedoForIos from '@common-ios-icons/icon-redo.svg?ios';
+import IconUndoForIos from '@common-ios-icons/icon-undo.svg?ios';
+import IconEditSettingsForIos from '@common-ios-icons/icon-edit-settings.svg?ios';
+import IconPlusForIos from '@common-ios-icons/icon-plus.svg?ios';
+import IconCopy from '@common-icons/icon-copy.svg';
+import IconCut from '@common-icons/icon-cut.svg';
+import IconPaste from '@common-icons/icon-paste.svg';
 
-function ab(e, t) {
-    var n = "undefined" != typeof Symbol && e[Symbol.iterator] || e["@@iterator"];
-    if (!n) {
-        if (Array.isArray(e) || (n = function (e, t) {
-            if (!e) return;
-            if ("string" == typeof e) return ob(e, t);
-            var n = Object.prototype.toString.call(e).slice(8, -1);
-            "Object" === n && e.constructor && (n = e.constructor.name);
-            if ("Map" === n || "Set" === n) return Array.from(e);
-            if ("Arguments" === n || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return ob(e, t)
-        }(e)) || t && e && "number" == typeof e.length) {
-            n && (e = n);
-            var r = 0, a = function () {
-            };
-            return {
-                s: a, n: function () {
-                    return r >= e.length ? {done: !0} : {done: !1, value: e[r++]}
-                }, e: function (e) {
-                    throw e
-                }, f: a
-            }
-        }
-        throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")
-    }
-    var o, i = !0, s = !1;
-    return {
-        s: function () {
-            n = n.call(e)
-        }, n: function () {
-            var e = n.next();
-            return i = e.done, e
-        }, e: function (e) {
-            s = !0, o = e
-        }, f: function () {
-            try {
-                i || null == n.return || n.return()
-            } finally {
-                if (s) throw o
-            }
-        }
-    }
-}
 const EditorUIController = () => null;
 EditorUIController.isSupportEditFeature = () => true;
 
@@ -55,154 +25,167 @@ EditorUIController.getUndoRedo = function (props) {
     const {disabledUndo, disabledRedo, onUndoClick, onRedoClick} = props;
     return (
         <React.Fragment>
+            {/* 撤销按钮 */}
             <Link
-                className={disabledUndo ? "disabled" : ""}
-                icon="icon-undo"
+                iconOnly={true}
+                className={disabledUndo && "disabled"}
                 onClick={onUndoClick}
-            />
+            >
+                {Device.ios ? (
+                    <SvgIcon
+                        symbolId={IconRedoForIos.id}
+                        className="icon icon-svg"
+                    />
+                ) : (
+                    <SvgIcon
+                        symbolId={IconRedoForAndroid.id}
+                        className="icon icon-svg"
+                    />
+                )}
+            </Link>
+
+            {/* 重做按钮 */}
             <Link
-                className={disabledRedo ? "disabled" : ""}
-                icon="icon-redo"
+                iconOnly={true}
+                className={disabledRedo && "disabled"}
                 onClick={onRedoClick}
-            />
+            >
+                {Device.ios ? (
+                    <SvgIcon
+                        symbolId={IconUndoForIos.id}
+                        className="icon icon-svg"
+                    />
+                ) : (
+                    <SvgIcon
+                        symbolId={IconUndoForAndroid.id}
+                        className="icon icon-svg"
+                    />
+                )}
+            </Link>
         </React.Fragment>
     );
 };
 
 EditorUIController.getToolbarOptions = function (props) {
-    const disableEditBtn = props.disabled;
+    const {disabledEdit, disabledAdd, onEditClick, onAddClick} = props;
     return (
         <React.Fragment>
             <Link
-                className={disableEditBtn ? "disabled" : ""}
+                iconOnly={true}
+                className={disabledEdit && "disabled"}
                 id="btn-edit"
-                icon="icon-edit-settings"
                 href={false}
-                onClick={e => props.onEditClick(e)}
-            />
+                onClick={onEditClick}
+            >
+                {Device.ios ? (
+                    <SvgIcon symbolId={IconEditSettingsForIos.id} className="icon icon-svg" />
+                ) : (
+                    <SvgIcon symbolId={IconEditSettingsForAndroid.id} className="icon icon-svg" />
+                )}
+            </Link>
+
             <Link
-                className={disableEditBtn ? "disabled" : ""}
+                iconOnly={true}
+                className={disabledAdd && "disabled"}
                 id="btn-add"
-                icon="icon-plus"
                 href={false}
-                onClick={e => props.onAddClick(e)}
-            />
+                onClick={onAddClick}
+            >
+                {Device.ios ? (
+                    <SvgIcon symbolId={IconPlusForIos.id} className="icon icon-svg" />
+                ) : (
+                    <SvgIcon symbolId={IconPlusForAndroid.id} className="icon icon-svg" />
+                )}
+            </Link>
         </React.Fragment>
     );
 };
 
 EditorUIController.initFocusObjects = function (e) {
-    Common.EditorApi.get().asc_registerCallback("asc_onFocusObject", (function (t) {
-        e.resetFocusObjects(t)
-    })), e.intf = {}, e.intf.filterFocusObjects = function () {
-        var t, n = [], r = !0, a = ab(e._focusObjects);
-        try {
-            for (a.s(); !(t = a.n()).done;) {
-                var o = t.value, i = o.get_ObjectType(), s = o.get_ObjectValue();
-                Asc.c_oAscTypeSelectElement.Paragraph == i ? s.get_Locked() || (r = !1) : Asc.c_oAscTypeSelectElement.Table == i ? s.get_Locked() || (n.push("table"), r = !1) : Asc.c_oAscTypeSelectElement.Slide == i ? s.get_LockLayout() || s.get_LockBackground() || s.get_LockTransition() || s.get_LockTiming() || n.push("slide") : Asc.c_oAscTypeSelectElement.Image == i ? s.get_Locked() || n.push("image") : Asc.c_oAscTypeSelectElement.Chart == i ? s.get_Locked() || n.push("chart") : Asc.c_oAscTypeSelectElement.Shape != i || s.get_FromChart() ? Asc.c_oAscTypeSelectElement.Hyperlink == i && n.push("hyperlink") : s.get_Locked() || (n.push("shape"), r = !1)
-            }
-        } catch (e) {
-            a.e(e)
-        } finally {
-            a.f()
+    Common.EditorApi.get().asc_registerCallback("asc_onFocusObject", (t => {
+            e.resetFocusObjects(t)
         }
-        !r && n.indexOf("image") < 0 && n.unshift("text");
-        var l = n.filter((function (e, t, n) {
-            return n.indexOf(e) === t
-        }));
-        return l.indexOf("hyperlink") > -1 && l.indexOf("text") < 0 && l.splice(l.indexOf("hyperlink"), 1), l.indexOf("chart") > -1 && l.indexOf("shape") > -1 && l.splice(l.indexOf("shape"), 1), l
-    }, e.intf.getSlideObject = function () {
-        var t, n = [], r = ab(e._focusObjects);
-        try {
-            for (r.s(); !(t = r.n()).done;) {
-                var a = t.value;
-                a.get_ObjectType() === Asc.c_oAscTypeSelectElement.Slide && n.push(a)
+    )),
+        e.intf = {},
+        e.intf.filterFocusObjects = () => {
+            const t = [];
+            let n = !0;
+            for (let r of e._focusObjects) {
+                const e = r.get_ObjectType()
+                    , a = r.get_ObjectValue();
+                Asc.c_oAscTypeSelectElement.Paragraph == e ? a.get_Locked() || (n = !1) : Asc.c_oAscTypeSelectElement.Table == e ? a.get_Locked() || (t.push("table"),
+                    n = !1) : Asc.c_oAscTypeSelectElement.Slide == e ? a.get_LockLayout() || a.get_LockBackground() || a.get_LockTransition() || a.get_LockTiming() || t.push("slide") : Asc.c_oAscTypeSelectElement.Image == e ? a.get_Locked() || t.push("image") : Asc.c_oAscTypeSelectElement.Chart == e ? a.get_Locked() || t.push("chart") : Asc.c_oAscTypeSelectElement.Shape != e || a.get_FromChart() ? Asc.c_oAscTypeSelectElement.Hyperlink == e && t.push("hyperlink") : a.get_Locked() || (t.push("shape"),
+                    n = !1)
             }
-        } catch (e) {
-            r.e(e)
-        } finally {
-            r.f()
+            !n && t.indexOf("image") < 0 && t.unshift("text");
+            const r = t.filter(( (e, t, n) => n.indexOf(e) === t));
+            return r.indexOf("hyperlink") > -1 && r.indexOf("text") < 0 && r.splice(r.indexOf("hyperlink"), 1),
+            r.indexOf("chart") > -1 && r.indexOf("shape") > -1 && r.splice(r.indexOf("shape"), 1),
+                r
         }
-        return n.length > 0 ? n[n.length - 1].get_ObjectValue() : void 0
-    }, e.intf.getParagraphObject = function () {
-        var t, n = [], r = ab(e._focusObjects);
-        try {
-            for (r.s(); !(t = r.n()).done;) {
-                var a = t.value;
-                a.get_ObjectType() === Asc.c_oAscTypeSelectElement.Paragraph && n.push(a)
+        ,
+        e.intf.getSlideObject = () => {
+            const t = [];
+            for (let n of e._focusObjects)
+                n.get_ObjectType() === Asc.c_oAscTypeSelectElement.Slide && t.push(n);
+            if (t.length > 0) {
+                return t[t.length - 1].get_ObjectValue()
             }
-        } catch (e) {
-            r.e(e)
-        } finally {
-            r.f()
         }
-        return n.length > 0 ? n[n.length - 1].get_ObjectValue() : void 0
-    }, e.intf.getShapeObject = function () {
-        var t, n = [], r = ab(e._focusObjects);
-        try {
-            for (r.s(); !(t = r.n()).done;) {
-                var a = t.value;
-                a.get_ObjectType() === Asc.c_oAscTypeSelectElement.Shape && n.push(a)
+        ,
+        e.intf.getParagraphObject = () => {
+            const t = [];
+            for (let n of e._focusObjects)
+                n.get_ObjectType() === Asc.c_oAscTypeSelectElement.Paragraph && t.push(n);
+            if (t.length > 0) {
+                return t[t.length - 1].get_ObjectValue()
             }
-        } catch (e) {
-            r.e(e)
-        } finally {
-            r.f()
         }
-        return n.length > 0 ? n[n.length - 1].get_ObjectValue() : void 0
-    }, e.intf.getImageObject = function () {
-        var t, n = [], r = ab(e._focusObjects);
-        try {
-            for (r.s(); !(t = r.n()).done;) {
-                var a = t.value;
-                a.get_ObjectType() == Asc.c_oAscTypeSelectElement.Image && a.get_ObjectValue() && n.push(a)
+        ,
+        e.intf.getShapeObject = () => {
+            const t = [];
+            for (let n of e._focusObjects)
+                n.get_ObjectType() === Asc.c_oAscTypeSelectElement.Shape && t.push(n);
+            if (t.length > 0) {
+                return t[t.length - 1].get_ObjectValue()
             }
-        } catch (e) {
-            r.e(e)
-        } finally {
-            r.f()
         }
-        return n.length > 0 ? n[n.length - 1].get_ObjectValue() : void 0
-    }, e.intf.getTableObject = function () {
-        var t, n = [], r = ab(e._focusObjects);
-        try {
-            for (r.s(); !(t = r.n()).done;) {
-                var a = t.value;
-                a.get_ObjectType() == Asc.c_oAscTypeSelectElement.Table && n.push(a)
+        ,
+        e.intf.getImageObject = () => {
+            const t = [];
+            for (let n of e._focusObjects)
+                n.get_ObjectType() == Asc.c_oAscTypeSelectElement.Image && n.get_ObjectValue() && t.push(n);
+            if (t.length > 0) {
+                return t[t.length - 1].get_ObjectValue()
             }
-        } catch (e) {
-            r.e(e)
-        } finally {
-            r.f()
         }
-        return n.length > 0 ? n[n.length - 1].get_ObjectValue() : void 0
-    }, e.intf.getChartObject = function () {
-        var t, n = [], r = ab(e._focusObjects);
-        try {
-            for (r.s(); !(t = r.n()).done;) {
-                var a = t.value;
-                a.get_ObjectType() == Asc.c_oAscTypeSelectElement.Chart && n.push(a)
+        ,
+        e.intf.getTableObject = () => {
+            const t = [];
+            for (let n of e._focusObjects)
+                n.get_ObjectType() == Asc.c_oAscTypeSelectElement.Table && t.push(n);
+            if (t.length > 0) {
+                return t[t.length - 1].get_ObjectValue()
             }
-        } catch (e) {
-            r.e(e)
-        } finally {
-            r.f()
         }
-        return n.length > 0 ? n[n.length - 1].get_ObjectValue() : void 0
-    }, e.intf.getLinkObject = function () {
-        var t, n = [], r = ab(e._focusObjects);
-        try {
-            for (r.s(); !(t = r.n()).done;) {
-                var a = t.value;
-                a.get_ObjectType() == Asc.c_oAscTypeSelectElement.Hyperlink && n.push(a)
+        ,
+        e.intf.getChartObject = () => {
+            const t = [];
+            for (let n of e._focusObjects)
+                n.get_ObjectType() == Asc.c_oAscTypeSelectElement.Chart && t.push(n);
+            if (t.length > 0) {
+                return t[t.length - 1].get_ObjectValue()
             }
-        } catch (e) {
-            r.e(e)
-        } finally {
-            r.f()
         }
-        return n.length > 0 ? n[n.length - 1].get_ObjectValue() : void 0
-    }
+        ,
+        e.intf.getLinkObject = () => {
+            const t = [];
+            for (let n of e._focusObjects)
+                n.get_ObjectType() == Asc.c_oAscTypeSelectElement.Hyperlink && t.push(n);
+            if (t.length > 0) {
+                return t[t.length - 1].get_ObjectValue()
+            }
+        }
 };
 
 EditorUIController.initTableTemplates = function (e) {
@@ -228,98 +211,154 @@ EditorUIController.getEditCommentControllers = function () {
 };
 
 EditorUIController.ContextMenu = {
-    mapMenuItems: function (e) {
-        var t, n, r, a, o = e.props.t, i = o("ContextMenu", {returnObjects: !0}), s = e.props,
-            l = s.canViewComments, c = s.isDisconnected, u = s.isVersionHistoryMode, p = Common.EditorApi.get(),
-            d = p.getSelectedElements(), f = p.can_CopyCut(), h = [], m = [], v = !1, g = !1, b = !1, y = !1,
-            w = !1, k = !1;
-        if (d.forEach((function (e) {
-            var t = e.get_ObjectType();
-            e.get_ObjectValue();
-            t == Asc.c_oAscTypeSelectElement.Paragraph ? v = !0 : t == Asc.c_oAscTypeSelectElement.Image ? b = !0 : t == Asc.c_oAscTypeSelectElement.Chart ? y = !0 : t == Asc.c_oAscTypeSelectElement.Shape ? w = !0 : t == Asc.c_oAscTypeSelectElement.Table ? g = !0 : t == Asc.c_oAscTypeSelectElement.Hyperlink ? k = !0 : t == Asc.c_oAscTypeSelectElement.Slide && !0
-        })), t = v || b || y || w || g, f && t && h.push({event: "copy", icon: "icon-copy"}), d.length > 0) {
-            var C = d[d.length - 1], E = (C.get_ObjectType(), C.get_ObjectValue()),
-                x = "function" == typeof E.get_Locked && E.get_Locked();
-            !x && (x = "function" == typeof E.get_LockDelete && E.get_LockDelete());
-            if (!x && !c && !u) f && t && (h.push({
-                event: "cut",
-                icon: "icon-cut"
-            }), r = 0, (n = h)[a = 1] = n.splice(r, 1, n[a])[0]), h.push({
-                event: "paste",
-                icon: "icon-paste"
-            }), g && p.CheckBeforeMergeCells() && m.push({
-                caption: i.menuMerge,
-                event: "merge"
-            }), g && p.CheckBeforeSplitCells() && m.push({
-                caption: i.menuSplit,
-                event: "split"
-            }), t && m.push({caption: i.menuDelete, event: "delete"}), g && m.push({
-                caption: i.menuDeleteTable,
-                event: "deletetable"
-            }), m.push({
-                caption: i.menuEdit,
-                event: "edit"
-            }), k || !1 === p.can_AddHyperlink() || m.push({
-                caption: i.menuAddLink,
-                event: "addlink"
-            }), e.isComments && l && m.push({
-                caption: i.menuViewComment,
+    mapMenuItems: e => {
+        const {t: t} = e.props
+            , n = t("ContextMenu", {
+            returnObjects: !0
+        })
+            , {canViewComments: r, isDisconnected: a, isVersionHistoryMode: o} = e.props
+            , s = Common.EditorApi.get()
+            , i = s.getSelectedElements()
+            , l = s.can_CopyCut();
+        let c = []
+            , d = []
+            , u = !1
+            , p = !1
+            , m = !1
+            , h = !1
+            , g = !1
+            , f = !1
+            , v = !1
+            , b = !1;
+        if (i.forEach((e => {
+                const t = e.get_ObjectType();
+                e.get_ObjectValue();
+                t == Asc.c_oAscTypeSelectElement.Paragraph ? u = !0 : t == Asc.c_oAscTypeSelectElement.Image ? m = !0 : t == Asc.c_oAscTypeSelectElement.Chart ? h = !0 : t == Asc.c_oAscTypeSelectElement.Shape ? g = !0 : t == Asc.c_oAscTypeSelectElement.Table ? p = !0 : t == Asc.c_oAscTypeSelectElement.Hyperlink ? f = !0 : t == Asc.c_oAscTypeSelectElement.Slide && (v = !0)
+            }
+        )),
+            b = u || m || h || g || p,
+        l && b && c.push({
+            event: "copy",
+            icon: IconCopy.id
+        }),
+        i.length > 0) {
+            let m = i[i.length - 1]
+                , g = (m.get_ObjectType(),
+                m.get_ObjectValue())
+                , v = "function" == typeof g.get_Locked && g.get_Locked();
+            !v && (v = "function" == typeof g.get_LockDelete && g.get_LockDelete());
+            const y = function(e, t, n) {
+                e[n] = e.splice(t, 1, e[n])[0]
+            };
+            if (!v && !a && !o) {
+                l && b && (c.push({
+                    event: "cut",
+                    icon: IconCut.id
+                }),
+                    y(c, 0, 1)),
+                    c.push({
+                        event: "paste",
+                        icon: IconPaste.id
+                    }),
+                p && s.CheckBeforeMergeCells() && d.push({
+                    caption: n.menuMerge,
+                    event: "merge"
+                }),
+                p && s.CheckBeforeSplitCells() && d.push({
+                    caption: n.menuSplit,
+                    event: "split"
+                }),
+                b && d.push({
+                    caption: n.menuDelete,
+                    event: "delete"
+                }),
+                p && d.push({
+                    caption: n.menuDeleteTable,
+                    event: "deletetable"
+                }),
+                    d.push({
+                        caption: n.menuEdit,
+                        event: "edit"
+                    }),
+                f || !1 === s.can_AddHyperlink() || d.push({
+                    caption: n.menuAddLink,
+                    event: "addlink"
+                });
+                u && h || !1 === s.can_AddQuotedComment() || !r || d.push({
+                    caption: n.menuAddComment,
+                    event: "addcomment"
+                }),
+                f && d.push({
+                    caption: t("ContextMenu.menuEditLink"),
+                    event: "editlink"
+                })
+            }
+            e.isComments && r && d.push({
+                caption: n.menuViewComment,
                 event: "viewcomment"
-            }), v && y || !1 === p.can_AddQuotedComment() || !l || m.push({
-                caption: i.menuAddComment,
-                event: "addcomment"
-            }), k && m.push({caption: o("ContextMenu.menuEditLink"), event: "editlink"});
-            k && m.push({caption: i.menuOpenLink, event: "openlink"})
+            }),
+            f && d.push({
+                caption: n.menuOpenLink,
+                event: "openlink"
+            })
         }
-        return Device.phone && m.length > 2 ? e.extraItems = m.splice(2, m.length, {
-            caption: i.menuMore,
+        return Device.phone && d.length > 2 ? e.extraItems = d.splice(2, d.length, {
+            caption: n.menuMore,
             event: "showActionSheet"
-        }) : m.length > 4 && (e.extraItems = m.splice(3, m.length, {
-            caption: i.menuMore,
+        }) : d.length > 4 && (e.extraItems = d.splice(3, d.length, {
+            caption: n.menuMore,
             event: "showActionSheet"
-        })), h.concat(m)
-    }, handleMenuItemClick: function (e, t) {
-        var n = Common.EditorApi.get();
+        })),
+            c.concat(d)
+    }
+    ,
+    handleMenuItemClick: (e, t) => {
+        const n = Common.EditorApi.get();
         switch (t) {
-            case"cut":
+            case "cut":
                 return n.Cut();
-            case"paste":
+            case "paste":
                 return n.Paste();
-            case"addcomment":
+            case "addcomment":
                 Common.Notifications.trigger("addcomment");
                 break;
-            case"merge":
+            case "merge":
                 n.MergeCells();
                 break;
-            case"delete":
+            case "delete":
                 n.asc_Remove();
                 break;
-            case"deletetable":
+            case "deletetable":
                 n.remTable();
                 break;
-            case"split":
+            case "split":
                 e.showSplitModal();
                 break;
-            case"edit":
-                setTimeout((function () {
-                    e.props.openOptions("edit")
-                }), 400);
+            case "edit":
+                setTimeout(( () => {
+                        e.props.openOptions("edit")
+                    }
+                ), 400);
                 break;
-            case"addlink":
-                setTimeout((function () {
-                    e.props.openOptions("add-link")
-                }), 400);
+            case "addlink":
+                setTimeout(( () => {
+                        e.props.openOptions("add-link")
+                    }
+                ), 400);
                 break;
-            case"editlink":
-                setTimeout((function () {
-                    e.props.openOptions("edit-link")
-                }), 400);
+            case "editlink":
+                setTimeout(( () => {
+                        e.props.openOptions("edit-link")
+                    }
+                ), 400);
                 break;
-            case"openlink":
-                var r;
-                n.getSelectedElements().forEach((function (e) {
-                    e.get_ObjectType() == Asc.c_oAscTypeSelectElement.Hyperlink && (r = e.get_ObjectValue().get_Value())
-                })), r && e.openLink(r);
+            case "openlink":
+                let t;
+                n.getSelectedElements().forEach((e => {
+                        e.get_ObjectType() == Asc.c_oAscTypeSelectElement.Hyperlink && (t = e.get_ObjectValue().get_Value())
+                    }
+                )),
+                t && e.openLink(t);
                 break;
             default:
                 return !1
@@ -354,18 +393,36 @@ EditorUIController.initFonts = function (e) {
 };
 
 EditorUIController.initEditorStyles = function (e) {
-    var t = Common.EditorApi.get();
-    t.asc_registerCallback("asc_onInitEditorStyles", (function (t) {
-        var n = t[0] || [], r = t[1] || [], a = [];
-        n.forEach((function (e, t) {
-            a.push({themeId: e.get_Index(), offsety: 40 * t})
-        })), r.forEach((function (e) {
-            a.push({imageUrl: e.get_Image(), themeId: e.get_Index(), offsety: 0})
-        })), e.addArrayThemes(a)
-    })), t.asc_registerCallback("asc_onUpdateThemeIndex", (function (t) {
-        e.changeSlideThemeIndex(t)
-    })), t.asc_registerCallback("asc_onUpdateLayout", (function (t) {
-        e.addArrayLayouts(t)
-    }))
+    const t = Common.EditorApi.get();
+    t.asc_registerCallback("asc_onInitEditorStyles", (t => {
+            let n = t[0] || []
+                , r = t[1] || []
+                , a = [];
+            n.forEach(( (e, t) => {
+                    a.push({
+                        themeId: e.get_Index(),
+                        offsety: 40 * t
+                    })
+                }
+            )),
+                r.forEach((e => {
+                        a.push({
+                            imageUrl: e.get_Image(),
+                            themeId: e.get_Index(),
+                            offsety: 0
+                        })
+                    }
+                )),
+                e.addArrayThemes(a)
+        }
+    )),
+        t.asc_registerCallback("asc_onUpdateThemeIndex", (t => {
+                e.changeSlideThemeIndex(t)
+            }
+        )),
+        t.asc_registerCallback("asc_onUpdateLayout", (t => {
+                e.addArrayLayouts(t)
+            }
+        ))
 }
 export default EditorUIController;

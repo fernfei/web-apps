@@ -1,6 +1,10 @@
 
-const EditorUIController = () => null;
+const EditorUIController = () => {
+    return null
+};
 
-EditorUIController.isSupportEditFeature = () => false;
+EditorUIController.isSupportEditFeature = () => {
+    return true
+};
 
 export default EditorUIController;

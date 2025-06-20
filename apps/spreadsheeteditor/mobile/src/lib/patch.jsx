@@ -1,54 +1,18 @@
 import React from 'react';
-import {Link, Icon, f7} from 'framework7-react';
-import {
-    AddCommentController,
-    EditCommentController,
-} from "../../../../common/mobile/lib/controller/collaboration/Comments";
+import {Link} from 'framework7-react';
 import { Device } from "../../../../common/mobile/utils/device";
-
-function ny(e, t) {
-    var n = "undefined" != typeof Symbol && e[Symbol.iterator] || e["@@iterator"];
-    if (!n) {
-        if (Array.isArray(e) || (n = function (e, t) {
-            if (!e) return;
-            if ("string" == typeof e) return ry(e, t);
-            var n = Object.prototype.toString.call(e).slice(8, -1);
-            "Object" === n && e.constructor && (n = e.constructor.name);
-            if ("Map" === n || "Set" === n) return Array.from(e);
-            if ("Arguments" === n || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return ry(e, t)
-        }(e)) || t && e && "number" == typeof e.length) {
-            n && (e = n);
-            var r = 0, a = function () {
-            };
-            return {
-                s: a, n: function () {
-                    return r >= e.length ? {done: !0} : {done: !1, value: e[r++]}
-                }, e: function (e) {
-                    throw e
-                }, f: a
-            }
-        }
-        throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")
-    }
-    var o, i = !0, s = !1;
-    return {
-        s: function () {
-            n = n.call(e)
-        }, n: function () {
-            var e = n.next();
-            return i = e.done, e
-        }, e: function (e) {
-            s = !0, o = e
-        }, f: function () {
-            try {
-                i || null == n.return || n.return()
-            } finally {
-                if (s) throw o
-            }
-        }
-    }
-};
-
+import SvgIcon from '@common/lib/component/SvgIcon'
+import IconRedoForAndroid from '@common-android-icons/icon-redo.svg';
+import IconUndoForAndroid from '@common-android-icons/icon-undo.svg';
+import IconEditSettingsForAndroid from '@common-android-icons/icon-edit-settings.svg';
+import IconPlusForAndroid from '@common-android-icons/icon-plus.svg';
+import IconRedoForIos from '@common-ios-icons/icon-redo.svg?ios';
+import IconUndoForIos from '@common-ios-icons/icon-undo.svg?ios';
+import IconEditSettingsForIos from '@common-ios-icons/icon-edit-settings.svg?ios';
+import IconPlusForIos from '@common-ios-icons/icon-plus.svg?ios';
+import IconCopy from '@common-icons/icon-copy.svg';
+import IconCut from '@common-icons/icon-cut.svg';
+import IconPaste from '@common-icons/icon-paste.svg';
 const EditorUIController = () => {
     return null
 };
@@ -62,36 +26,78 @@ EditorUIController.toolbarOptions = {
         const {disabledUndo, disabledRedo, onUndoClick, onRedoClick} = props;
         return (
             <React.Fragment>
+                {/* 撤销按钮 */}
                 <Link
-                    className={disabledUndo ? "disabled" : ""}
-                    icon="icon-undo"
+                    iconOnly={true}
+                    className={disabledUndo && "disabled"}
                     onClick={onUndoClick}
-                />
+                >
+                    {Device.ios ? (
+                        <SvgIcon
+                            symbolId={IconRedoForIos.id}
+                            className="icon icon-svg"
+                        />
+                    ) : (
+                        <SvgIcon
+                            symbolId={IconRedoForAndroid.id}
+                            className="icon icon-svg"
+                        />
+                    )}
+                </Link>
+
+                {/* 重做按钮 */}
                 <Link
-                    className={disabledRedo ? "disabled" : ""}
-                    icon="icon-redo"
+                    iconOnly={true}
+                    className={disabledRedo && "disabled"}
                     onClick={onRedoClick}
-                />
+                >
+                    {Device.ios ? (
+                        <SvgIcon
+                            symbolId={IconUndoForIos.id}
+                            className="icon icon-svg"
+                        />
+                    ) : (
+                        <SvgIcon
+                            symbolId={IconUndoForAndroid.id}
+                            className="icon icon-svg"
+                        />
+                    )}
+                </Link>
             </React.Fragment>
         );
     },
     getEditOptions: function (props) {
+        const {disabledEdit, disabledAdd, onEditClick, onAddClick} = props;
         return (
             <React.Fragment>
                 <Link
-                    className={(props.disabled || "obj" === props.focusOn && props.wsProps.Objects && props.isShapeLocked) && "disabled"}
+                    iconOnly={true}
+                    className={disabledEdit && "disabled"}
                     id="btn-edit"
                     icon="icon-edit-settings"
                     href={false}
-                    onClick={props.onEditClick}
-                />
+                    onClick={onEditClick}
+                >
+                    {Device.ios ? (
+                        <SvgIcon symbolId={IconEditSettingsForIos.id} className="icon icon-svg" />
+                    ) : (
+                        <SvgIcon symbolId={IconEditSettingsForAndroid.id} className="icon icon-svg" />
+                    )}
+                </Link>
+                
                 <Link
-                    className={(props.disabled || "obj" === props.focusOn && props.wsProps.Objects || "cell" === props.focusOn && props.wsProps.InsertHyperlinks && props.wsProps.Objects && props.wsProps.Sort) && "disabled"}
                     id="btn-add"
+                    className={disabledAdd && "disabled"}
                     icon="icon-plus"
                     href={false}
-                    onClick={props.onAddClick}
-                />
+                    onClick={onAddClick}
+                >
+                    {Device.ios ? (
+                        <SvgIcon symbolId={IconPlusForIos.id} className="icon icon-svg" />
+                    ) : (
+                        <SvgIcon symbolId={IconPlusForAndroid.id} className="icon icon-svg" />
+                    )}
+                </Link>
             </React.Fragment>
         )
     }
@@ -104,99 +110,84 @@ EditorUIController.initThemeColors = function () {
 };
 
 EditorUIController.initCellInfo = function (e) {
-    var t = Common.EditorApi.get(), n = e.storeFocusObjects, r = e.storeCellSettings, a = e.storeTextSettings,
-        o = e.storeChartSettings;
-    t.asc_registerCallback("asc_onSelectionChanged", (function (e) {
-        n.resetCellInfo(e), n.setIsLocked(e), r.initCellSettings(e), a.initTextSettings(e);
-        var i = t.asc_getGraphicObjectProps();
-        i.length > 0 ? (n.resetFocusObjects(i), "obj" !== n.focusOn && n.changeFocus(!0), n.chartObject && o.updateChartStyles(t.asc_getChartPreviews(n.chartObject.get_ChartProperties().getType()))) : "cell" !== n.focusOn && n.changeFocus(!1)
+    const t = Common.EditorApi.get(), n = e.storeFocusObjects, r = e.storeCellSettings, o = e.storeTextSettings,
+        a = e.storeChartSettings;
+    t.asc_registerCallback("asc_onSelectionChanged", (e => {
+        n.resetCellInfo(e), n.setIsLocked(e), r.initCellSettings(e), o.initTextSettings(e);
+        let s = t.asc_getGraphicObjectProps();
+        s.length > 0 ? (n.resetFocusObjects(s), "obj" !== n.focusOn && n.changeFocus(!0), n.chartObject && a.updateChartStyles(t.asc_getChartPreviews(n.chartObject.get_ChartProperties().getType()))) : "cell" !== n.focusOn && n.changeFocus(!1)
     }));
-    var i = n;
-    i.intf = {}, i.intf.getSelections = function () {
-        var e, t, n, r, a, o = [], s = !1;
-        switch (i._cellInfo.asc_getSelectionType()) {
+    let s = n;
+    s.intf = {}, s.intf.getSelections = () => {
+        const e = [];
+        let t, n, r, o, a, i, l, c, d, u = !1;
+        switch (s._cellInfo.asc_getSelectionType()) {
             case Asc.c_oAscSelectionType.RangeCells:
-                !0;
-                break;
-            case Asc.c_oAscSelectionType.RangeRow:
-                !0;
-                break;
-            case Asc.c_oAscSelectionType.RangeCol:
-                !0;
-                break;
-            case Asc.c_oAscSelectionType.RangeMax:
-                !0;
-                break;
-            case Asc.c_oAscSelectionType.RangeImage:
                 t = !0;
                 break;
-            case Asc.c_oAscSelectionType.RangeShape:
+            case Asc.c_oAscSelectionType.RangeRow:
+                n = !0;
+                break;
+            case Asc.c_oAscSelectionType.RangeCol:
                 r = !0;
                 break;
-            case Asc.c_oAscSelectionType.RangeChart:
-                e = !0;
+            case Asc.c_oAscSelectionType.RangeMax:
+                o = !0;
                 break;
-            case Asc.c_oAscSelectionType.RangeChartText:
+            case Asc.c_oAscSelectionType.RangeImage:
+                i = !0;
+                break;
+            case Asc.c_oAscSelectionType.RangeShape:
+                c = !0;
+                break;
+            case Asc.c_oAscSelectionType.RangeChart:
                 a = !0;
                 break;
+            case Asc.c_oAscSelectionType.RangeChartText:
+                d = !0;
+                break;
             case Asc.c_oAscSelectionType.RangeShapeText:
-                n = !0
+                l = !0
         }
-        if (t || r || e) {
-            t = r = e = !1;
-            for (var l = Common.EditorApi.get().asc_getGraphicObjectProps(), c = 0; c < l.length; c++) if (l[c].asc_getObjectType() == Asc.c_oAscTypeSelectElement.Image) {
-                var u = l[c].asc_getObjectValue();
-                s = s || u.asc_getLocked();
-                var p = u.asc_getShapeProperties();
-                p ? p.asc_getFromChart() ? e = !0 : r = !0 : u.asc_getChartProperties() ? (e = !0, !0) : t = !0
+        if (i || c || a) {
+            i = c = a = !1;
+            let e = !1, t = Common.EditorApi.get().asc_getGraphicObjectProps();
+            for (let n = 0; n < t.length; n++) if (t[n].asc_getObjectType() == Asc.c_oAscTypeSelectElement.Image) {
+                const r = t[n].asc_getObjectValue();
+                u = u || r.asc_getLocked();
+                const o = r.asc_getShapeProperties();
+                o ? o.asc_getFromChart() ? a = !0 : c = !0 : r.asc_getChartProperties() ? (a = !0, e = !0) : i = !0
             }
-        } else if (n || a) for (var d = Common.EditorApi.get().asc_getGraphicObjectProps(), f = 0; f < d.length; f++) {
-            var h = d[f].asc_getObjectType();
-            if (h == Asc.c_oAscTypeSelectElement.Image) {
-                var m = d[f].asc_getObjectValue();
-                s = s || m.asc_getLocked()
-            } else h == Asc.c_oAscTypeSelectElement.Paragraph || h == Asc.c_oAscTypeSelectElement.Math && !0
-        }
-        return e || a ? (o.push("chart"), a && o.push("text")) : !r && !n || t ? t ? (o.push("image"), r && o.push("shape")) : (o.push("cell"), i._cellInfo.asc_getHyperlink() && o.push("hyperlink")) : (o.push("shape"), n && o.push("text")), o
-    }, i.intf.getShapeObject = function () {
-        var e, t = [], n = ny(i._focusObjects);
-        try {
-            for (n.s(); !(e = n.n()).done;) {
-                var r = e.value;
-                r.get_ObjectType() === Asc.c_oAscTypeSelectElement.Image && r.get_ObjectValue() && r.get_ObjectValue().get_ShapeProperties() && t.push(r)
+        } else if (l || d) {
+            const e = Common.EditorApi.get().asc_getGraphicObjectProps();
+            let t = !1;
+            for (var p = 0; p < e.length; p++) {
+                const n = e[p].asc_getObjectType();
+                if (n == Asc.c_oAscTypeSelectElement.Image) {
+                    const t = e[p].asc_getObjectValue();
+                    u = u || t.asc_getLocked()
+                } else n == Asc.c_oAscTypeSelectElement.Paragraph || n == Asc.c_oAscTypeSelectElement.Math && (t = !0)
             }
-        } catch (e) {
-            n.e(e)
-        } finally {
-            n.f()
         }
-        return t.length > 0 ? t[t.length - 1].get_ObjectValue() : void 0
-    }, i.intf.getImageObject = function () {
-        var e, t = [], n = ny(i._focusObjects);
-        try {
-            for (n.s(); !(e = n.n()).done;) {
-                var r = e.value;
-                r.get_ObjectType() === Asc.c_oAscTypeSelectElement.Image && t.push(r)
-            }
-        } catch (e) {
-            n.e(e)
-        } finally {
-            n.f()
+        return a || d ? (e.push("chart"), d && e.push("text")) : !c && !l || i ? i ? (e.push("image"), c && e.push("shape")) : (e.push("cell"), s._cellInfo.asc_getHyperlink() && e.push("hyperlink")) : (e.push("shape"), l && e.push("text")), e
+    }, s.intf.getShapeObject = () => {
+        const e = [];
+        for (let t of s._focusObjects) t.get_ObjectType() === Asc.c_oAscTypeSelectElement.Image && t.get_ObjectValue() && t.get_ObjectValue().get_ShapeProperties() && e.push(t);
+        if (e.length > 0) {
+            return e[e.length - 1].get_ObjectValue()
         }
-        return t.length > 0 ? t[t.length - 1].get_ObjectValue() : void 0
-    }, i.intf.getChartObject = function () {
-        var e, t = [], n = ny(i._focusObjects);
-        try {
-            for (n.s(); !(e = n.n()).done;) {
-                var r = e.value;
-                r.get_ObjectType() === Asc.c_oAscTypeSelectElement.Image && r.get_ObjectValue() && r.get_ObjectValue().get_ChartProperties() && t.push(r)
-            }
-        } catch (e) {
-            n.e(e)
-        } finally {
-            n.f()
+    }, s.intf.getImageObject = () => {
+        const e = [];
+        for (let t of s._focusObjects) t.get_ObjectType() === Asc.c_oAscTypeSelectElement.Image && e.push(t);
+        if (e.length > 0) {
+            return e[e.length - 1].get_ObjectValue()
         }
-        return t.length > 0 ? t[t.length - 1].get_ObjectValue() : void 0
+    }, s.intf.getChartObject = () => {
+        const e = [];
+        for (let t of s._focusObjects) t.get_ObjectType() === Asc.c_oAscTypeSelectElement.Image && t.get_ObjectValue() && t.get_ObjectValue().get_ChartProperties() && e.push(t);
+        if (e.length > 0) {
+            return e[e.length - 1].get_ObjectValue()
+        }
     }
 };
 
@@ -216,109 +207,117 @@ EditorUIController.initFonts = function (e) {
 };
 
 EditorUIController.ContextMenu = {
-    mapMenuItems: function (e) {
-        var t, n, r, a, o, i, s, l, c = e.props.t, u = c("ContextMenu", {returnObjects: !0}), p = e.props,
-            d = p.canViewComments, f = p.isDisconnected, h = p.wsProps, m = p.wsLock, g = p.isResolvedComments,
-            v = p.isVersionHistoryMode, b = Common.EditorApi.get(), y = b.asc_getCellInfo(),
-            C = !!y.asc_getPivotTableInfo(), k = [], w = [], E = y.asc_getLocked(),
-            x = y.asc_getSelectionType(), S = y.asc_getXfs(), _ = y.asc_getComments(),
-            A = _[0] && _[0].asc_getSolved();
-        switch (x) {
+    mapMenuItems: e => {
+        const {t: t} = e.props, n = t("ContextMenu", {returnObjects: !0}), {
+                canViewComments: r,
+                isDisconnected: o,
+                wsProps: a,
+                wsLock: s,
+                isResolvedComments: i,
+                isVersionHistoryMode: l
+            } = e.props, c = Common.EditorApi.get(), d = c.asc_getCellInfo(), u = !!d.asc_getPivotTableInfo(),
+            p = c.asc_canFillHandle(), m = [], h = [];
+        let g, f, v, b, y, C, w, E, k, x = d.asc_getLocked();
+        const S = d.asc_getSelectionType(), _ = d.asc_getXfs(), A = d.asc_getComments(),
+            T = A[0] && A[0].asc_getSolved();
+        switch (S) {
             case Asc.c_oAscSelectionType.RangeCells:
-                t = !0;
+                g = !0;
                 break;
             case Asc.c_oAscSelectionType.RangeRow:
-                n = !0;
+                f = !0;
                 break;
             case Asc.c_oAscSelectionType.RangeCol:
-                r = !0;
+                v = !0;
                 break;
             case Asc.c_oAscSelectionType.RangeMax:
-                !0;
+                b = !0;
                 break;
             case Asc.c_oAscSelectionType.RangeImage:
-                o = !0;
+                C = !0;
                 break;
             case Asc.c_oAscSelectionType.RangeShape:
-                s = !0;
+                E = !0;
                 break;
             case Asc.c_oAscSelectionType.RangeChart:
-                a = !0;
+                y = !0;
                 break;
             case Asc.c_oAscSelectionType.RangeChartText:
-                l = !0;
+                k = !0;
                 break;
             case Asc.c_oAscSelectionType.RangeShapeText:
-                i = !0
+                w = !0
         }
-        return (o || s || a || i || l) && h.Objects ? [] : (!E && (o || s || a || i || l) && b.asc_getGraphicObjectProps().every((function (e) {
-            return e.asc_getObjectType() == Asc.c_oAscTypeSelectElement.Image && (E = e.asc_getObjectValue().asc_getLocked()), !E
-        })), E || b.isCellEdited || f ? k.push({event: "copy", icon: "icon-copy"}) : v || (k.push({
-            event: "cut",
-            icon: "icon-cut"
-        }), k.push({event: "copy", icon: "icon-copy"}), k.push({
-            event: "paste",
-            icon: "icon-paste"
-        }), o || s || a || i || l ? w.push({
-            caption: u.menuEdit,
+        return (C || E || y || w || k) && a.Objects ? [] : (!x && (C || E || y || w || k) && c.asc_getGraphicObjectProps().every((e => (e.asc_getObjectType() == Asc.c_oAscTypeSelectElement.Image && (x = e.asc_getObjectValue().asc_getLocked()), !x))), x || c.isCellEdited || o ? m.push({
+            event: "copy",
+            icon: IconCopy,id
+        }) : l || (m.push({event: "cut", icon: IconCut.id}), m.push({
+            event: "copy",
+            icon: IconCopy.id
+        }), m.push({event: "paste", icon: IconPaste.id}), C || E || y || w || k ? h.push({
+            caption: n.menuEdit,
             event: "edit"
-        }) : (r ? h.FormatColumns || (w.push({caption: u.menuHide, event: "hide"}), w.push({
-            caption: u.menuShow,
+        }) : (v ? a.FormatColumns || (h.push({caption: n.menuHide, event: "hide"}), h.push({
+            caption: n.menuShow,
             event: "show"
-        })) : n ? h.FormatRows || (w.push({caption: u.menuHide, event: "hide"}), w.push({
-            caption: u.menuShow,
+        })) : f ? a.FormatRows || (h.push({caption: n.menuHide, event: "hide"}), h.push({
+            caption: n.menuShow,
             event: "show"
-        })) : t && (E || w.push({
-            caption: u.menuCell,
+        })) : g && (x || h.push({
+            caption: n.menuCell,
             event: "edit"
-        }), y.asc_getMerge() != Asc.c_oAscMergeOptions.None || h.FormatCells || w.push({
-            caption: u.menuMerge,
+        }), d.asc_getMerge() != Asc.c_oAscMergeOptions.None || a.FormatCells || h.push({
+            caption: n.menuMerge,
             event: "merge"
-        }), y.asc_getMerge() != Asc.c_oAscMergeOptions.Merge || h.FormatCells || w.push({
-            caption: u.menuUnmerge,
+        }), d.asc_getMerge() != Asc.c_oAscMergeOptions.Merge || a.FormatCells || h.push({
+            caption: n.menuUnmerge,
             event: "unmerge"
-        }), h.FormatCells || w.push(S.asc_getWrapText() ? {
-            caption: u.menuUnwrap,
+        }), a.FormatCells || h.push(_.asc_getWrapText() ? {
+            caption: n.menuUnwrap,
             event: "unwrap"
         } : {
-            caption: u.menuWrap,
+            caption: n.menuWrap,
             event: "wrap"
-        })), w.push({
-            caption: b.asc_getSheetViewSettings().asc_getIsFreezePane() ? u.menuUnfreezePanes : u.menuFreezePanes,
+        })), h.push({
+            caption: c.asc_getSheetViewSettings().asc_getIsFreezePane() ? n.menuUnfreezePanes : n.menuFreezePanes,
             event: "freezePanes"
-        })), C || m || w.push({
-            caption: u.menuDelete,
+        })), u || s || h.push({
+            caption: n.menuDelete,
             event: "del"
-        }), d && (_ && _.length && (!A && !g || g) ? w.push({
-            caption: u.menuViewComment,
+        }), r && (A && A.length && (!T && !i || i) && h.push({
+            caption: n.menuViewComment,
             event: "viewcomment"
-        }) : t && _ && !_.length && !h.Objects && w.push({
-            caption: u.menuAddComment,
+        }), g && A && !A.length && !a.Objects && h.push({
+            caption: n.menuAddComment,
             event: "addcomment"
-        }))), y.asc_getHyperlink() && !y.asc_getMultiselect() ? (v || w.push({
-            caption: c("ContextMenu.menuEditLink"),
+        }))), d.asc_getHyperlink() && !d.asc_getMultiselect() ? (l || h.push({
+            caption: t("ContextMenu.menuEditLink"),
             event: "editlink"
-        }), w.push({
-            caption: u.menuOpenLink,
+        }), h.push({
+            caption: n.menuOpenLink,
             event: "openlink"
-        })) : y.asc_getHyperlink() || y.asc_getMultiselect() || C || h.InsertHyperlinks || v || w.push({
-            caption: u.menuAddLink,
+        })) : d.asc_getHyperlink() || d.asc_getMultiselect() || u || a.InsertHyperlinks || l || h.push({
+            caption: n.menuAddLink,
             event: "addlink"
-        }), i && b.asc_canAddShapeHyperlink() && (y.asc_getHyperlink() || h.InsertHyperlinks ? (v || w.push({
-            caption: c("ContextMenu.menuEditLink"),
+        }), w && c.asc_canAddShapeHyperlink() && (d.asc_getHyperlink() || a.InsertHyperlinks ? (l || h.push({
+            caption: t("ContextMenu.menuEditLink"),
             event: "editlink"
-        }), w.push({caption: u.menuOpenLink, event: "openlink"})) : v || w.push({
-            caption: u.menuAddLink,
+        }), h.push({caption: n.menuOpenLink, event: "openlink"})) : l || h.push({
+            caption: n.menuAddLink,
             event: "addlink"
-        })), Device.phone && w.length > 2 ? e.extraItems = w.splice(2, w.length, {
-            caption: u.menuMore,
+        })), p && h.push({
+            caption: t("ContextMenu.menuAutofill"),
+            event: "autofillCells"
+        }), Device.phone && h.length > 2 ? e.extraItems = h.splice(2, h.length, {
+            caption: n.menuMore,
             event: "showActionSheet"
-        }) : w.length > 4 && (e.extraItems = w.splice(3, w.length, {
-            caption: u.menuMore,
+        }) : h.length > 4 && (e.extraItems = h.splice(3, h.length, {
+            caption: n.menuMore,
             event: "showActionSheet"
-        })), k.concat(w))
-    }, handleMenuItemClick: function (e, t) {
-        var n = Common.EditorApi.get(), r = n.asc_getCellInfo();
+        })), m.concat(h))
+    }, handleMenuItemClick: (e, t) => {
+        const n = Common.EditorApi.get();
+        let r = n.asc_getCellInfo();
         switch (t) {
             case"cut":
                 return n.asc_Cut();
@@ -345,7 +344,7 @@ EditorUIController.ContextMenu = {
                 n.asc_setCellTextWrap(!1);
                 break;
             case"edit":
-                setTimeout((function () {
+                setTimeout((() => {
                     e.props.openOptions("edit")
                 }), 400);
                 break;
@@ -362,17 +361,20 @@ EditorUIController.ContextMenu = {
                 n[r.asc_getSelectionType() == Asc.c_oAscSelectionType.RangeRow ? "asc_showRows" : "asc_showColumns"]();
                 break;
             case"addlink":
-                setTimeout((function () {
+                setTimeout((() => {
                     e.props.openOptions("add-link")
                 }), 400);
                 break;
             case"editlink":
-                setTimeout((function () {
+                setTimeout((() => {
                     e.props.openOptions("edit-link")
                 }), 400);
                 break;
             case"freezePanes":
                 n.asc_freezePane();
+                break;
+            case"autofillCells":
+                n.asc_fillHandleDone();
                 break;
             default:
                 return !1
