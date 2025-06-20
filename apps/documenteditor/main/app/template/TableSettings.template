@@ -99,6 +99,7 @@
     <tr>
         <td class="padding-small" colspan=2>
             <div id="table-btn-edit" style="width:100%;"></div>
+            <div id="table-btn-auto-fit" style="width:100%;"></div>
         </td>
     </tr>
     <tr>
